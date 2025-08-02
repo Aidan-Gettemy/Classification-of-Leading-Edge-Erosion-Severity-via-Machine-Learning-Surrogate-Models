@@ -1,0 +1,69 @@
+% Plot data gathered from simulation experiments including:
+% - time series
+% - scatter plots of the data summary statistics
+clc;close all;clear;
+addpath funcs/
+%%
+% Grab the experiment name
+expName = "Exp1";
+% What were the first and last job numbers
+JobNum = [136,180];
+% ExperimentID: determines the location of the result folder
+ExperimentID = "Data/"+expName;
+
+% StatusFileID: located the StatusFile, which manages the experiment
+StatusFileID = ExperimentID+"/"+...
+    expName+"_"+num2str(JobNum(1))+"_"+num2str(JobNum(2))+"_Status.txt";
+
+% Gather data from StatusFile
+data = gather_up(StatusFileID);
+%% Choose a time-series datatable to explore:
+TabNum=10;
+tableID = data{TabNum}+"/Sensor_Data/SensorDataT.txt";
+dataTab = readtable(tableID);
+%%
+outputNameID = data{TabNum}+"/Sensor_Data/output_names.mat";
+outnames = load(outputNameID);
+OPNames=outnames.Output_Names;
+%% Investigate time-series one at a time
+
+% Note, transientes are assumed to disappear in the last 4800 entries of
+% each ts-data column
+s = plot_ts(OPNames,dataTab);
+%% Plot Multiple Plots at Once
+
+start = 16;
+stop = 30;
+batch = cell(1,stop-start);
+iter=1;
+for i = start:stop
+    TabNum=i;
+    tableID = data{TabNum}+"/Sensor_Data/SensorDataT.txt";
+    dataTab = readtable(tableID);
+    
+    outputNameID = data{TabNum}+"/Sensor_Data/output_names.mat";
+    outnames = load(outputNameID);
+    OPNames=outnames.Output_Names;
+    
+    plot_series = [ones(1,10);linspace(59,68,10)];
+    %plot_series = [1,1,1;30,32,71];
+    ttl = "Plot Variables for Test #"+num2str(i);
+    batch{1,iter} = {dataTab,OPNames,plot_series,ttl};
+    iter = iter+1;
+end
+
+
+s = plot_multi(batch);
+%% Let us look at the wind speed
+expresultID = "Data/Exp1/ExperimentResultTable136_180.txt";
+exp1Tab = readtable(expresultID);
+
+%%
+er_inputs = readmatrix("MorrisInputs.txt");
+winddir = exp1Tab.WindDirection;
+windspeed = exp1Tab.WindSpeed;
+airdensity = exp1Tab.AirDensity;
+shear = exp1Tab.WindShear;
+alpha = er_inputs([136:150],[1:30],5);
+
+newtable = table(winddir,windspeed,airdensity,shear,alpha);
