@@ -1,7 +1,7 @@
 # README
 In this repository, there are two main components: (1) Files and data for the article "Wind Turbine Surrogate Modeling for Leading Edge Erosion Detection", (2) a Template for OpenFAST experiments. 
 
-# Files, data, and models
+# Scripts and data
 In the main folder, scripts are titled *Inputs, *Driver, *PlotData, *AnalysisFeatures. The first type of script assembles a table to run a batch of experiments. The next script runs the experiment itself, generating a file to keep track of the progress. The final two types of scripts plot the data from an experiment or do other post-processing and visualization tasks. The first experiment pertains to sensitivity analysis, the second experiment pertains to the simulated test dataset, the final set of experiments were used to train the PPzGP emulator. 
 
 In order to run the scripts, a version of the OpenFAST driver must be placed in the main folder. A version of the ROBUSTGASP code for Matlab needs to be placed in the PPGP_ROM folder, this can be found at [RobustGasp](https://github.com/mengyanggu/robustgasp-in-matlab). Also, a version of zGP is required in the same folder. The version included in this script is simply a slightly modified version of the one found at [zGP](https://github.com/SideofMan/zGP).
