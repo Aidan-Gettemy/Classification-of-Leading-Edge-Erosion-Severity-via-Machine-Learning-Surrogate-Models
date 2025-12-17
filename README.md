@@ -1,10 +1,10 @@
 # README
-In this repository, there are two main components: (1) Files and data for the article "Wind Turbine Surrogate Modeling for Leading Edge Erosion Detection", (2) a Template for OpenFAST experiments. 
+In this repository, there are two main components: (1) Files and data for the article "Classification of Leading Edge Erosion Severity via Machine Learning Surrogate Models", (2) a Template for OpenFAST experiments. 
 
 # Scripts and data
 In the main folder, scripts are titled *Inputs, *Driver, *PlotData, *AnalysisFeatures. The first type of script assembles a table to run a batch of experiments. The next script runs the experiment itself, generating a file to keep track of the progress. The final two types of scripts plot the data from an experiment or do other post-processing and visualization tasks. The first experiment pertains to sensitivity analysis, the second experiment pertains to the simulated test dataset, the final set of experiments were used to train the PPzGP emulator. 
 
-In order to run the scripts, a version of the OpenFAST driver must be placed in the main folder. A version of the ROBUSTGASP code for Matlab needs to be placed in the PPGP_ROM folder, this can be found at [RobustGasp](https://github.com/mengyanggu/robustgasp-in-matlab). Also, a version of zGP is required in the same folder. The version included in this script is simply a slightly modified version of the one found at [zGP](https://github.com/SideofMan/zGP).
+In order to run the scripts, a version of the OpenFAST driver must be placed in the main folder. The current projects developed by NREL as part of the OpenFAST software package can be found [here]{https://github.com/openfast}. A version of the driver code must be placed in the main folder. The reference wind turbine can be found [here]{}. A version of the ROBUSTGASP code for Matlab needs to be placed in the PPGP_ROM folder, this can be found at [RobustGasp](https://github.com/mengyanggu/robustgasp-in-matlab). Also, a version of zGP is required in the same folder. The version included in this script is simply a slightly modified version of the one found at [zGP](https://github.com/SideofMan/zGP)[^1]
 
 Below is a description of the template for automating the set-up of OpenFAST experiments in MATLAB. 
 
@@ -28,7 +28,9 @@ This framework streamlines OpenFAST input-output handling, while keeping the dat
 
 Note: Requires:
 - MatLab
+- RobustGasp for MatLab ([here]{https://github.com/mengyanggu/robustgasp-in-matlab})
 - OpenFAST excecutable (adjust the path in the `testdriver.m` file)
+- OpenFAST controller conpiled in the correct directory ([here]{https://github.com/OpenFAST/nrel-5mw-controllers})
 
 Before running scripts, first copy the ***`Template_IEA-15-240-RWT-Monopile` folder and rename it `Simulate`***.
 
@@ -137,3 +139,5 @@ Now we have gone through what each file does.  Hopefully this is clear enough to
 - Run `ExpDriver.m` to set up the `Simulate` folder and run OpenFAST on each test, gathering up the results from all the tests into a data table, before moving the data table and the `StatusFile.txt` to the experiment folder within the `Data` folder.
 
 Now the experiment is finished, and the results are organized for analysis.
+
+[^1]: Seidman, J.: SideofMan/zGP: zGP in R v1.0.0, https://doi.org/10.5281/zenodo.17956672, 2025.
