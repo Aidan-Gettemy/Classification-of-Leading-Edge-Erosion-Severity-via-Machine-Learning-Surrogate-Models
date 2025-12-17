@@ -28,13 +28,9 @@ This framework streamlines OpenFAST input-output handling, while keeping the dat
 
 Note: Requires:
 - MatLab
-- RobustGasp for MatLab ([here]{https://github.com/mengyanggu/robustgasp-in-matlab})
+- RobustGasp for MatLab ([here](https://github.com/mengyanggu/robustgasp-in-matlab))
 - OpenFAST excecutable (adjust the path in the `testdriver.m` file)
-- OpenFAST controller conpiled in the correct directory ([here]{https://github.com/OpenFAST/nrel-5mw-controllers})
-
-Before running scripts, first copy the ***`Template_IEA-15-240-RWT-Monopile` folder and rename it `Simulate`***.
-
-Also, provide an **inflow wind** file to run tests on (and change `ExpTableGenerator.m` accordingly).  This file needs to be placed in the `Template_IEA-15-240-RWT-Monopile/IEA-15-240-RWT/Wind` folder.
+- OpenFAST controller conpiled in the correct directory ([here](https://github.com/OpenFAST/nrel-5mw-controllers))
 
 ## Step by Step
 
