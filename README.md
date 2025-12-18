@@ -11,10 +11,17 @@ In order to run the scripts, a version of the OpenFAST driver must be placed in 
 2. Experiment 2: Primary wind turbine erosion experiment. `Exp2Inputs.m`, `Exp2Driver.m`, `Exp2PlotData.m`, `Exp2AnalysisFeatures.m`.
 3. Experiment 3: PPzGP training. `Exp3Inputs.m`, `Exp3Driver.m`, `Exp3PlotData.m`, `Exp3AnalysisFeatures.m`.
 
+To recreate Figure #3 in the paper, run `Exp1ReportResults.m`.
+
 ## Machine Learning
 
+To recreate Figure #4 in the paper, run `MachineLearning/FeatureSelection.m` up to line 132.
 
+To recreate Figures #5 and #6 in the paper, run `PPGP_ROM/PPGP_Train_Test.m' from line 166. 
 
+To recreate Figure #7 and #8 in the paper, run 
+
+Note, the inputs for the GP to create the emulator training dataset are found in 
 
 # Template for OpenFAST Experimentation
 
