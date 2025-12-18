@@ -6,6 +6,11 @@ In the main folder, scripts are titled *Inputs, *Driver, *PlotData, *AnalysisFea
 
 In order to run the scripts, a version of the OpenFAST driver must be placed in the main folder. The current projects developed by NREL as part of the OpenFAST software package can be found [here](https://github.com/openfast). A version of the driver code must be placed in the main folder. The reference wind turbine can be found [here](https://github.com/OpenFAST/r-test/tree/main/glue-codes/openfast). A version of the ROBUSTGASP code for Matlab needs to be placed in the PPGP_ROM folder, this can be found at [RobustGasp](https://github.com/mengyanggu/robustgasp-in-matlab). Also, a version of zGP is required in the same folder. The version included in this script is simply a slightly modified version of the one found at [zGP](https://github.com/SideofMan/zGP)[^1]. Finally, Reference Wind Turbine files (such as NREL5MW RWT) are found [here](https://github.com/OpenFAST/r-test/tree/main/glue-codes/openfast).
 
+# Classification of Leading Edge Erosion Severity via Machine Learning Surrogate Models
+
+## Reproducing results from the paper
+
+
 Below is a description of the template for automating the set-up of OpenFAST experiments in MATLAB. 
 
 # Template for OpenFAST Experimentation
@@ -14,19 +19,19 @@ This library provides a template for managing experiments with the OpenFAST [Ope
 
 # Description:
 
-This library/framework solves the problem faced when running numerical experiments with OpenFAST; changing the input files in the appropriate manner takes a lot of effort.  With a large number of inputs, selecting only those pertinent to a particular study is difficult.  This library is a flexible, DIY inspired approach for running experiments.  It separates the structuring of the experimental design and the analysis of the results from the editing of the input files.  It is modular, using many helper functions which can be adapted to handle any input file type, enabling this framework to apply to different turbine setups and experiment designs.
+This library/framework sets up experiments with OpenFAST by changing the input files in the appropriatly.  With a large number of inputs, selecting only those pertinent to a particular study is difficult.  This library is a flexible approach for running experiments.  It separates the structuring of the experimental design and the analysis of the results from the editing of the input files.  It is modular, using helper functions which can be adapted to handle different input file types, enabling this framework to apply to different turbine setups and experiment designs.
 
-The heart of the library are two files.
+The core of the library are two files.
 - `ExpTableGenerator.m`
 - `ExpDriver.m`
 
 Once the user has configured these files (and the helper functions), running the experiment and organizing the results for further analysis is simple.  Simply run the `ExpTableGenerator.m` then run the `ExpDriver.m`.
 
-This framework streamlines OpenFAST input-output handling, while keeping the data organized.  The user specifies an experiment to run by giving the input (independent) variables and settings for each test in the experiment as a matrix/table (each row is a different test, each column a different input).  Then the framework will set up and run the simulations required, organizing the outputs channels (dependent variables) requested by the user into a table that mirrors the input table provided.  In the end, the code generates a data-folder and a table of outputs from the experiment, in the same row-order as the input table.  Within the data-folder, small test-specific folders hold the summary files, time series data, and statistics for each test.
+This framework streamlines OpenFAST input-output handling and keeps the data organized.  The user specifies an experiment to run by giving the input variables and settings for each test in the experiment as a matrix/table (each row is a different test, each column a different input).  Then the framework will set up and run the simulations required, organizing the outputs channels (dependent variables) requested by the user into a table that mirrors the input table provided.  In the end, the code generates a data-folder and a table of outputs from the experiment, in the same row-order as the input table.  Within the data-folder, small test-specific folders hold the summary files, time series data, and statistics for each test.
 
 # Instructions:
 
-Note: Requires:
+Note: The scripts in this folder require:
 - MatLab
 - RobustGasp for MatLab ([here](https://github.com/mengyanggu/robustgasp-in-matlab))
 - OpenFAST excecutable (adjust the path in the `testdriver.m` file)
@@ -34,11 +39,9 @@ Note: Requires:
 
 ## Step by Step
 
-Here we will explain how to go from desiging the input table, to modifying the helper functions, to handling how the outputs are organized into a final table.
-
 ### Step One: Table Generator 
 
-The `ExpTableGenerator.m` file uses the selected OpenFAST inputs given to make an InputTable for each experiment.  The resulting table is saved as a text file and will be read by the `ExpDriver.m` script.  Each column represents an independent variable that will trigger a change in the files for OpenFAST to read.  Each test is a row of the table; a unique configuration of the inputs.  Taken together, all of the rows of the table will help to answer some question about wind turbine engineering.  Follow the comments within the table generator file in order to see where to make changes.
+The `ExpTableGenerator.m` file uses the selected OpenFAST inputs given to make an InputTable for each experiment.  The resulting table is saved as a text file and will be read by the `ExpDriver.m` script.  Each column represents an independent variable.  Each test is a row of the table at a unique configuration of the inputs.  Taken together, all of the rows of the table will help to answer some question about wind turbine engineering.  Follow the comments within the table generator file in order to see where to make changes.
 
 - Line 5: Determines the name of the experiment (must match the name given in `ExpDriver.m`)
 - Line 16: The *invarNames* refer to the independent variables required settings in the experiment.  Some of them may simply be a part of the experimental set-up and not variables at all.  In the given example, `windfileID` is the name of the wind file to simulate on, and will not be included in analysis.  In future experiments, multiple wind files may be specified.
