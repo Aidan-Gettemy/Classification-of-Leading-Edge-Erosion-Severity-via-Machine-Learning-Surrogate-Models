@@ -14,9 +14,11 @@ In order to run the scripts, a version of the OpenFAST driver must be placed in 
 ## Machine Learning
 
 
-Below is a description of the template for automating the set-up of OpenFAST experiments in MATLAB. 
+
 
 # Template for OpenFAST Experimentation
+
+Below is a description of the template for automating the set-up of OpenFAST experiments in MATLAB. 
 
 This library provides a template for managing experiments with the OpenFAST [OpenFAST](https://github.com/OpenFAST/openfast?tab=readme-ov-file) simulation tool using MATLAB.  This code is a general template, fit to be modified for many different experiments.
 
@@ -82,26 +84,11 @@ This file has three main sections.  In the first section, a series of helper fun
 
 ### Step Four: Anatomy of a Helper Function 
 
-In the first section of the included `setup.m` script, there are 5 subsections.
-- First, the `make_readme,m' helper function is called.
-- Second, the `chg_wnd.m` helper function is called.
-- Third, the `make_fst.m` helper function is called.
-- Fourth, the `chg_tower.m` helper function is called.
-- Finally, the `chg_hydrodyn.m` helper function is called.
+The `setup.m` script is called first.
 
 Each of these helper functions is similar and has the job of modifying one type of file for the simulation.  There is one file not needed for simulation, but should be changed and saved for each test; the README file is designed to document the inputs for a given test.  This file is modified and saved along with the results of the simulation in the test-specific data subfolder at the end of the experiment.  In this way, there is a unique README for each test.  This file can be found in the template directory.  The `make_readme.m` function can be modified to name tests according to any convention.  One obvious convention is to name tests based on the value of the independent variables for that specific test.
 
 The anatomy of a helper function is simple.  It takes as its input some portion of the current test row, and the location of the template file to be read in and the location of the resulting file to be saved to.
-
-As an example, take `chg_tower.m`. 
-
-- Line 5: We gather up all the lines from the template file into a cell.
-- Line 9: Each line is split before it can be used.  Depending on the type of file/line being edited, different entries of the resulting string array need to be modified.  In this case, the tower properties being edited are the 4th and 5th entries.
-- Line 15: The form vector establishes the text style that will be entered into the simulation directory.
-- Line 16: The formats object takes as its parts the form vector, and an array with ones and zeros.  The ones correspond to entries in the form vector that will be replaced.
-- Line 17: The edit_type cell takes sub-cells that have a simple form.  The number of subcells must match the dimension of the array in Line 9.  THe sub-cells have the form {"multiply/replace", value}.  The multiply trigger means that value will be multiplied by the entry found in the corresponding edit spot in the template file.  The replace trigger means that value will replace what was originally in that location.  Multiply only works with doubles.  Replace can be any entry.
-- Line 18: In this line, we replace the ith entry of the data cell (which contains all of the lines of the original file), with the instructions on how to modify that line.  The last input to the `editor.m` helper function is a number (called the *flag*).  If *flag* equals 1, then the value (or multiply) if it is numeric, will be saved in scientific notation with 15 significant digits.  Otherwise, the value is saved with 4 significant digits, not in scientific form.
-- Line 21: The modified data cell is printed to the correct location in the simulation directory.  We are good to go.
 
 As demonstrated above, the helper functions make use of a few basic functions.  These are:
 - `gather_up.m`: takes a fileID and returns a cell of all of its lines.
