@@ -99,7 +99,7 @@ for i=14:23
     text(...
         1*meanimps(isorted_imp(i))+.001,i-14,...
         strrep(varnames{isorted_imp(i)},'_',''),...
-        'FontSize',14,'FontWeight', 'bold', ...    % Make text bold
+        'FontSize',20,'FontWeight', 'bold', ...    % Make text bold
     'BackgroundColor', 'yellow', ... % Add background color
     'EdgeColor', 'black', ...    % Add border around text
     'Margin', 5,'FontName','Helvetica');                % Add padding around text ...
@@ -107,7 +107,7 @@ for i=14:23
         text(...
         1*meanimps(isorted_imp(i))+.001,i-14,...
         strrep(varnames{isorted_imp(i)},'_',''),...
-        'FontSize',14,...
+        'FontSize',20,...
     'Margin', 5,'FontName','Helvetica');                % Add padding around text ...
     end
     
@@ -117,14 +117,14 @@ scatter(sorted_imp(14:23),0:23-14,180,'k','filled')
 %title("Classification Inputs",'FontSize',18)
 xlim([0,max(sorted_imp)*1.75])
 ylim([-1,10])
-xlabel("Importance Score","FontSize",14)
-ylabel("Rank","FontSize",14)
+xlabel("Importance Score","FontSize",20)
+ylabel("Rank","FontSize",20)
 g = gca();
 g.XGrid  = 'on';
 g.YTick = [-1:10];
 g.YTickLabel = {'','10','9','8','7','6','5','4','3','2','1'};
 g.XMinorGrid = 'on';
-g.FontSize = 14;
+g.FontSize = 20;
 g.FontName = 'Helvetica';
 
 saveID = "Plots/PredictorImportance.pdf";
