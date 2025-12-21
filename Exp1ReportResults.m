@@ -1,54 +1,54 @@
 % We need a script in order to make some summary tables
 addpath erosionfuncs\
-% First, plot a representation of the three blade shapes:
-shapes = ["Linear","Quadratic","Cubic"];
-nodeLocs = [0, 2.8667, 5.6, 8.333, 11.75, ...
-    15.85, 19.95, 24.05, 28.15, 32.25, 36.35, ...
-    40.45, 44.55, 48.65, 52.75, 56.1667, 58.9, 61.633];
-
-reg1 = [nodeLocs(4) nodeLocs(6)];
-reg2 = [nodeLocs(6) nodeLocs(8)];
-reg3 = [nodeLocs(8) nodeLocs(10)];
-reg4 = [nodeLocs(10) nodeLocs(12)];
-reg5 = [nodeLocs(12) nodeLocs(14)];
-reg6 = [nodeLocs(14) nodeLocs(18)];
-
-total_len = nodeLocs(18) - nodeLocs(4);
-
-mids = zeros(6,1);
-
-for i = 1:6
-    phrase = "reg"+num2str(i);
-    phrase = "("+phrase+"(2)+"+phrase+"(1))/2" +"-nodeLocs(4)";
-    phrase = "("+phrase+")/total_len";
-    phrase = "mids("+num2str(i)+",1) = "+phrase+";";
-    eval(phrase)
-end
-f = figure;
-f.Position = [50 50 1350 550];
-for j = 1:3
-    subplot(1,3,j)
-    bladeprofs = zeros(10,6);
-    alphas = linspace(0,1,5);
-    hold on
-    lgd = {};
-    sty = ["-","--","-.",":"];
-    markers = ["o","^","diamond","*"];
-    for i = 1:numel(alphas)
-        bladeprofs(i,:) = erShape(j,alphas(i));
-        plot(mids,bladeprofs(i,:),lineWidth=5,Marker=markers(1+mod(i,numel(markers))),LineStyle=sty(1+mod(i,numel(sty))))
-        lgd{i} = "severity "+num2str(alphas(i));
-    end
-    ylim([0,1])
-    xlabel("Region Location (% of radius)",FontSize=14)
-    ylabel("Severity Level",FontSize=14)
-    legend(lgd,location="northwest",FontSize=14)
-    title("#"+num2str(j)+": "+shapes(j)+" Erosion Level Profiles",FontSize=14)
-    g = gca();g.FontSize=14;
-end
-
-saveID = "Plots/"+"BladeProfilesPlots.png";
-print('-dpng',saveID)
+% % First, plot a representation of the three blade shapes:
+% shapes = ["Linear","Quadratic","Cubic"];
+% nodeLocs = [0, 2.8667, 5.6, 8.333, 11.75, ...
+%     15.85, 19.95, 24.05, 28.15, 32.25, 36.35, ...
+%     40.45, 44.55, 48.65, 52.75, 56.1667, 58.9, 61.633];
+% 
+% reg1 = [nodeLocs(4) nodeLocs(6)];
+% reg2 = [nodeLocs(6) nodeLocs(8)];
+% reg3 = [nodeLocs(8) nodeLocs(10)];
+% reg4 = [nodeLocs(10) nodeLocs(12)];
+% reg5 = [nodeLocs(12) nodeLocs(14)];
+% reg6 = [nodeLocs(14) nodeLocs(18)];
+% 
+% total_len = nodeLocs(18) - nodeLocs(4);
+% 
+% mids = zeros(6,1);
+% 
+% for i = 1:6
+%     phrase = "reg"+num2str(i);
+%     phrase = "("+phrase+"(2)+"+phrase+"(1))/2" +"-nodeLocs(4)";
+%     phrase = "("+phrase+")/total_len";
+%     phrase = "mids("+num2str(i)+",1) = "+phrase+";";
+%     eval(phrase)
+% end
+% f = figure;
+% f.Position = [50 50 1350 550];
+% for j = 1:3
+%     subplot(1,3,j)
+%     bladeprofs = zeros(10,6);
+%     alphas = linspace(0,1,5);
+%     hold on
+%     lgd = {};
+%     sty = ["-","--","-.",":"];
+%     markers = ["o","^","diamond","*"];
+%     for i = 1:numel(alphas)
+%         bladeprofs(i,:) = erShape(j,alphas(i));
+%         plot(mids,bladeprofs(i,:),lineWidth=5,Marker=markers(1+mod(i,numel(markers))),LineStyle=sty(1+mod(i,numel(sty))))
+%         lgd{i} = "severity "+num2str(alphas(i));
+%     end
+%     ylim([0,1])
+%     xlabel("Region Location (% of radius)",FontSize=14)
+%     ylabel("Severity Level",FontSize=14)
+%     legend(lgd,location="northwest",FontSize=14)
+%     title("#"+num2str(j)+": "+shapes(j)+" Erosion Level Profiles",FontSize=14)
+%     g = gca();g.FontSize=14;
+% end
+% 
+% saveID = "Plots/"+"BladeProfilesPlots.png";
+% print('-dpng',saveID)
 %% Look at the results
 clc;close;clear;
 % Grab the data
@@ -173,8 +173,8 @@ ttls  = ["Blade root moment","Blade tip acceleration","Lift coefficient",...
 ttlshort = ["root","tip","l","d","gp"];
 lgd = {"Erosion", "Wind direction", "Wind speed", "Air density", "Wind shear"};
 f = figure;
-f.Position = [50 50 1200 600];
-tiledlayout(2,3)
+f.Position = [50 50 1000 600];
+tiledlayout(2,3,"TileSpacing","tight")
 for i = 1:5
     
     nexttile
@@ -187,25 +187,27 @@ for i = 1:5
     
     grid on
     
-    title(ttls(i),'FontSize',14,'FontWeight','normal','FontName','Helvetica')
+    title(ttls(i),'FontSize',20,'FontWeight','normal','FontName','Helvetica')
     xlim([0,1.3])
     ylim([0,1])
     yscale log
     xscale log
-    if i == 4 || i == 5 || i == 3
-        xlabel("\mu^* (log scale)",'FontName','Helvetica')
+    if i == 4 || i == 5 || i == 6
+        xlabel("\mu^* (log scale)",'FontName','Helvetica','FontSize',20)
     else
         g = gca;
-        g.XTickLabel = [];
+        %g.XTickLabel = [];
+       
     end
     if i == 1 || i ==4
-        ylabel("\sigma (log scale)",'FontName','Helvetica')
+        ylabel("\sigma (log scale)",'FontName','Helvetica','FontSize',20)
     else
         g = gca;
-        g.YTickLabel= [];
+        %g.YTickLabel= [];
+        
     end
     g = gca();
-    g.FontSize=14;
+    
     g.FontName='Helvetica';
 
     saveID = "Plots/"+"MorrisPlots"+ttlshort(i)+".png";
@@ -219,11 +221,12 @@ for i = 1:5
         for j = 1:5
             scatter(1,5-j,100,'filled','Marker',shapes(j),...
                 'MarkerEdgeColor','k','MarkerFaceColor','white','LineWidth',2);
-            text(1,5-j,sprintf('          %s',lgd{j}),...
-                'FontSize',14,'FontName','Helvetica');
+            text(1,5-j,sprintf('  %s',lgd{j}),...
+                'FontSize',20,'FontName','Helvetica','HorizontalAlignment','left');
         end
-        g = gca;g.FontSize = 14;
-        xlim([0,3])
+        
+        g = gca;g.FontSize = 20;
+        xlim([0,10])
         ylim([-1,6])
         axis off;
         
