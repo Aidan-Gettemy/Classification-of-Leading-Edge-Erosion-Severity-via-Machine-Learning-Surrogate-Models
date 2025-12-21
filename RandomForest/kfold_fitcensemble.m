@@ -28,8 +28,10 @@ Sim_samples = 100;
 Em_samples = 1000;
 percent = .15;
 % Simulation 
+rng(1)
 [Sim_In_train,Sim_Out_train,Sim_In_test,Sim_Out_test] = class_split(classes,Sim_samples,percent,Simulationdata.Variables,SimOutput);
 % Emulation 
+rng(1)
 [Em_In_train,Em_Out_train,Em_In_test,Em_Out_test] = class_split(classes,Em_samples,percent,emdata(:,[1:8]).Variables,emdata.Alpha);
 %% Load the models
 load("Ensemble_Emulation_results.mat")
@@ -45,30 +47,27 @@ Sim_Data_Out = [Sim_Out_train;Sim_Out_test];
 Em_Data_In = [Em_In_train;Em_In_test];
 Em_Data_Out = [Em_Out_train;Em_Out_test];
 %% Use crossvalidation for the Simulation Trained Model
+rng(1)
 New_Sim_Model = fitcensemble(Sim_Data_In,Sim_Data_Out,...
     "Method",Sim_Mdl.Method,...
     "NumLearningCycles",Sim_Mdl.ModelParameters.NLearn,...
     'Learners',Sim_Mdl.ModelParameters.LearnerTemplates);
-rng(100)
+rng(1)
 Sim_CVensemble = crossval(New_Sim_Model,'Kfold',10);
 %% Make the Sim Confusion Chart
 
-%f = figure;
-%f.Position = [50 50 850 650];
-subplot(1,7,1:3)
+f = figure;
+f.Position = [50 50 1400 750];
+subplot(1,15,1:9)
+rng(1)
 [Sim_pred,Sim_score] = kfoldPredict(Sim_CVensemble);
 cm = confusionchart(Sim_Data_Out,Sim_pred);
-cm.FontSize = 14;
+cm.FontSize = 20;
 %cm.Title = "Simulation Trained";
-cm.Normalization = "total-normalized";
-cm.RowSummary = "row-normalized";
-cm.ColumnSummary = "column-normalized";
+%cm.Normalization = "total-normalized";
+%cm.RowSummary = "row-normalized";
+%cm.ColumnSummary = "column-normalized";
 cm.FontName = 'Helvetica';
-%%
-saveID = "Plots/combinedsimulation.pdf";%"Plots/sim_sim_10foldConfusionMat.png";
-%print('-dpng',saveID)
-ax = gcf;
-exportgraphics(ax,saveID,'Resolution',300)
 %% Make the Sim ROC 
 figure
 
@@ -93,9 +92,8 @@ x = get(Sim_sim_rocObj_test.plot);
 turbocustom=turbo(n);
 colors = interp1(linspace(0, 24, n), turbocustom, linspace(0,24,n));
 close
-f = figure;
-f.Position = [50 50 1200 600];
-subplot(1,7,5:7)
+
+subplot(1,15,11:15)
 set(gca, 'ColorOrder', colors , 'NextPlot', 'replacechildren');
 hold on
 vals = linspace(0,24,17);
@@ -108,30 +106,38 @@ end
 grid on
 plot([0,1],[0,1],'LineStyle','--','LineWidth',4)
 lgd{i+1} = ["1:1"];
-xlabel("False Positive Rate",'FontName','Helvetica')
-ylabel("True Positive Rate",'FontName','Helvetica')
+xlabel("False Positive Rate",'FontName','Helvetica','FontSize',20)
+ylabel("True Positive Rate",'FontName','Helvetica','FontSize',20)
 %title("Ensemble: Simulation Trained on Simulation Data")
-fontsize(14,"points")
-legend(lgd,'Location','southeast','FontSize',14,'FontName','Helvetica')
+legend(lgd,'Location','best','FontSize',16,'FontName','Helvetica')
 colormap(turbo(n))
 cb = colorbar;cb.FontName = 'Helvetica';
 saveID = "Plots/sim_sim_10foldAOCcurve.png";
 fontname(gca,"Helvetica")
+% %print('-dpng',saveID) 
+%% Save both the AUC curve (right) and the confusion matrix (left)
+saveID = "Plots/combinedsimulation.pdf";%"Plots/sim_sim_10foldConfusionMat.png";
 %print('-dpng',saveID)
+ax = gcf;
+exportgraphics(ax,saveID,'Resolution',300)
 %% Use crossvalidation for the Emulation Trained Models
+rng(1)
 New_Em_Model = fitcensemble(Em_Data_In,Em_Data_Out,...
     "Method",Em_Mdl.Method,...
     "NumLearningCycles",Em_Mdl.ModelParameters.NLearn,...
     'Learners',Em_Mdl.ModelParameters.LearnerTemplates);
-rng(100)
+rng(1)
 Em_CVensemble = crossval(New_Em_Model,'Kfold',10);
 %% Em on Em Confusion Chart
-[Em_pred,Em_score] = kfoldPredict(Em_CVensemble);
-cm = confusionchart(Em_Data_Out,Em_pred);
-cm.FontSize = 18;
+% hold off
+% rng(1)
+% [Em_pred,Em_score] = kfoldPredict(Em_CVensemble);
+% cm = confusionchart(Em_Data_Out,Em_pred);
+% cm.FontSize = 18;
 %% Evaluate the Emulation Model on the same splits as the Simulation Models
 M_scores = zeros(500,5,10);
 M_pred = zeros(500,10);
+rng(100)
 for j = 1:10
     Em_Test_pred = zeros(500,1);
     True = zeros(500,1);
@@ -153,22 +159,18 @@ for i = 1:5
 end
 
 %% Em on Sim Confusion Chart
-% f = figure;
-% f.Position = [50 50 850 650];
-subplot(1,7,1:3)
+f = figure;
+f.Position = [50 50 1400 750];
+subplot(1,15,1:9)
 cm = confusionchart((True-1)./4,(Em_Test_pred-1)./4);
-cm.FontSize = 14;
+cm.FontSize = 20;
 %cm.Title = "Emulation Trained";
-cm.Normalization = "total-normalized";
-cm.RowSummary = "row-normalized";
-cm.ColumnSummary = "column-normalized";
+%cm.Normalization = "total-normalized";
+%cm.RowSummary = "row-normalized";
+%cm.ColumnSummary = "column-normalized";
 cm.FontName = 'Helvetica';
 saveID = "Plots/Em_sim_10foldConfusionMat.png";
-%print('-dpng',saveID)
-saveID = "Plots/combinedemulation.pdf";%"Plots/sim_sim_10foldConfusionMat.png";
-%% print('-dpng',saveID)
-ax = gcf;
-exportgraphics(ax,saveID,'Resolution',300)
+
 %% Em on Sim ROC
 figure
 Em_sim_rocObj_test = rocmetrics((True-1)./4,(Em_Test_score-1)./4,New_Em_Model.ClassNames);
@@ -191,9 +193,9 @@ n = numel(Sim_Mdl.ClassNames);
 x = get(Sim_sim_rocObj_test.plot);
 turbocustom=turbo(n);
 colors = interp1(linspace(0, 24, n), turbocustom, linspace(0,24,n));
-f = figure;
-f.Position = [50 50 1200 600];
-subplot(1,7,5:7)
+close
+
+subplot(1,15,11:15)
 set(gca, 'ColorOrder', colors , 'NextPlot', 'replacechildren');
 hold on
 vals = linspace(0,24,17);
@@ -206,16 +208,22 @@ end
 grid on
 plot([0,1],[0,1],'LineStyle','--','LineWidth',4)
 lgd{i+1} = ["1:1"];
-xlabel("False Positive Rate",'FontName','Helvetica')
-ylabel("True Positive Rate",'FontName','Helvetica')
+xlabel("False Positive Rate",'FontName','Helvetica','FontSize',20)
+ylabel("True Positive Rate",'FontName','Helvetica','FontSize',20)
 %title("Ensemble: Emulation Trained on Simulation Data")
-fontsize(14,"points")
-legend(lgd,'Location','southeast','FontSize',14)
+%fontsize(14,"points")
+legend(lgd,'Location','southeast','FontSize',16)
 colormap(turbo(n))
 cb = colorbar;cb.FontName = 'Helvetica';
 fontname(gca,"Helvetica")
 saveID = "Plots/em_sim_10foldAOCcurve.png";
 %print('-dpng',saveID)
+%% Plot both on a shared figure: left is Confusion matrix right is ROC
+%print('-dpng',saveID)
+saveID = "Plots/combinedemulation.pdf";%"Plots/sim_sim_10foldConfusionMat.png";
+% print('-dpng',saveID)
+ax = gcf;
+exportgraphics(ax,saveID,'Resolution',300)
 %% Out of Box Predictions
 err_sim_sim = zeros(1,10);
 for i = 1:10
@@ -244,7 +252,7 @@ B(4,:) = [mean(err_sim_sim),mean(err_em_sim)];
 B(5,:) = [std(err_sim_sim),std(err_em_sim)];
 B(6,:) = [1,100*(B(4,2)-B(4,1))/B(4,1)];
 
-
+disp(B)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [In_train,Out_train,In_test,Out_test] = class_split(classes,samples,percent,Input,Output)
 
