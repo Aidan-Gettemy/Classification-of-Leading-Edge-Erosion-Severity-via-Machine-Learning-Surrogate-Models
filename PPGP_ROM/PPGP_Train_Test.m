@@ -7,160 +7,160 @@ addpath('zGP_upper_constraint_for_Aidan/zGP_upper_constraint_for_Aidan/zGP_upper
 dataId = "../Data/Exp3/LARGE2ExperimentResultTable1_210.txt";
 data = readtable(dataId);
 %%
-clc
-for i = 1:6
-    a = min(data(161:210,i+4).Variables);
-    b = max(data(161:210,i+4).Variables);
-    a = [a,b];
-    fprintf('[%.2f %.2f]\n',a(1),a(2));
-end
-%% Power Emulator 
-
-% Calling this function will train and save the model on p% of the data
-% The input and output used are saved with the model 
-
-% Test on x% of the data
-percts = (210-[30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180])./210;
-%%
-for i = 1:numel(percts)
-    percent = percts(i); % Testing percent
-    [mdl, In_test, Out_test] = trainGP_genpwr(data, percent);
-    save("GenPwrGP_"+num2str(1-percent)+"mdl.mat",'mdl');
-    save("GenPwrGP_"+num2str(1-percent)+"In_test.mat",'In_test')
-    save("GenPwrGP_"+num2str(1-percent)+"Out_test.mat",'Out_test')
-end
-
-%% Visualize Results
-
-% for each level of training; produce
-% - plot of the predicted vs true with conf ints
-% -- Save as a figure 
-% - a value for the rmse 
-% Test the model
-
-trainpercs = 1-percts;
-err = zeros(1,numel(trainpercs));
-for j =1:numel(trainpercs)
-    trainperc = trainpercs(j);
-    model = load("GenPwrGP_"+num2str(trainperc)+"mdl.mat","mdl");
-    model = model.mdl;
-    In_test = load("GenPwrGP_"+num2str(trainperc)+"In_test.mat","In_test");
-    In_test = In_test.In_test;
-    Out_test = load("GenPwrGP_"+num2str(trainperc)+"Out_test.mat","Out_test");
-    Out_test = Out_test.Out_test;
-    
-    Out_predict=predict_ppgasp(model,In_test);
-    
-    % Only display some of the data
-
-    % Want to show 50 points
-    p=1-30/numel(Out_test);% percent of testing points to leave out
-    if p <0;p=1;end
-    plotpart = cvpartition(numel(Out_predict.mean(:,1)),'HoldOut',p);
-    
-    % Later, we might consider using the zgp to account for the upper limit
-    % of 5MW for power
-    [Outsort, predictInd] = sort(Out_test);
-    figure
-    hold on 
-    scatter(1:numel(Outsort(training(plotpart),1)),...
-        Out_predict.mean(predictInd(training(plotpart),:)),'filled')
-    
-    scatter(1:numel(Outsort(training(plotpart),:)),...
-        Out_test(predictInd(training(plotpart),:)),'filled')
-    
-    lower = Out_predict.lower95(predictInd(training(plotpart),:));
-    upper = Out_predict.upper95(predictInd(training(plotpart),:));
-    for i =1:numel(lower)
-        plot([i,i],[lower(i),upper(i)],"Color",'k')
-    end
-    ylabel("Generator Power")
-    xlabel("Testing Points Indexed by Value")
-    legend("Predicted","True","95% Confidence Interval",Location="southeast")
-    title("Generator Power GP: Training Points = "...
-        +num2str(numel(data(:,1))*trainperc)+", Showing "...
-        +num2str(numel(Out_test(training(plotpart),:)))+" Testing Points")
-
-    err(j) = rms(Out_predict.mean-Out_test);
-    count = 0;
-    for k = 1:numel(Out_test)
-        if Out_predict.mean(k) > Out_test(k)-2*Out_predict.sd(i)
-            if Out_predict.mean(k) < Out_test(k)+2*Out_predict.sd(i)
-                count = count+1;
-            end
-        end
-    end
-    coverage(j) = count/numel(Out_test);
-end
-%% Plot the RMSE for each model as a bargraph
-figure
-bar(trainpercs,err)
-title("RMSE vs Training Percent of Data")
-grid on
-% Save as a figure
-%% Plot the percent of predicted in 95% confidence
-figure
-bar(trainpercs,coverage(1:numel(trainpercs)))
-title("95% Coverage vs Training Percent of Data")
-grid on 
-%% Examine the PPGPs ability to emulate all of the promising quantities at once
-
-% Extract the features we want to use.
-% Read in the selected predictors
-predimpID = "../MachineLearning/Classification_imp.txt";
-Importances=readmatrix(predimpID);
-% We will use the first 8 most important variables 
-numvars = 8;
-% Percent of data to put towards testing
-percent = (210-170)/210;
-% Grab the columns for testing and training 
-[In_train,Out_train,In_test,Out_test,targets] = PPGP_dataprep(numvars,Importances,data,percent);
-
-% Note, several of these variables are range limited.
-
-% Write a function which takes in the original values and returns the 
-% values given by zGP imputation 
-zGP_cols = [2,6,7,8];
-lim_types = ["lower","lower","lower","upper"];
-zGP_outs = zeros(numel(Out_train(:,1)),numel(zGP_cols));
-zGP_scale = zeros(numel(zGP_cols),1);
-zGP_shift = zeros(numel(zGP_cols),1);
-yRLs = zeros(numel(In_train(:,1)),numel(zGP_cols));
-
-%% Impute zGP values for the desired columns
-for i =1:numel(zGP_cols)
-    output = Out_train(:,zGP_cols(i));
-    [zGP_outs(:,i), zGP_scale(i), zGP_shift(i), yRLs(:,i)] = zGP_process2(output,...
-        In_train, lim_types(i));
-end
-
-%% Fix the Training Ouputs
-Out_train(:,zGP_cols) = zGP_outs;
-
-%options.trend=[ones(numel(Out_train(:,1)),numvars)  In_train];
-%options.zero_mean  = false; 
-%options.nugget_est = false;
-
-% At last, the model
-modelPPzGP=ppgasp(In_train,Out_train);
-% Create an object which we can save which has all of the pieces that we
-% need:
-
-%%
-PP_GP.model = modelPPzGP;
-PP_GP.In_test = In_test;
-PP_GP.In_train = In_train;
-PP_GP.Out_test = Out_test;
-PP_GP.Out_train = Out_train;
-PP_GP.numvars = numvars;
-PP_GP.scaling_factors = zGP_scale;
-PP_GP.zGP_index = zGP_cols;
-PP_GP.lim_types = lim_types;
-PP_GP.target_vars = targets;
-PP_GP.zGP_shift = zGP_shift;
-PP_GP.yRLs = yRLs;
-% Save this object
-save("PP_zGP"+num2str(1-percent)+"package.mat",'PP_GP');
+% clc
+% for i = 1:6
+%     a = min(data(161:210,i+4).Variables);
+%     b = max(data(161:210,i+4).Variables);
+%     a = [a,b];
+%     fprintf('[%.2f %.2f]\n',a(1),a(2));
+% end
+% %% Power Emulator 
+% 
+% % Calling this function will train and save the model on p% of the data
+% % The input and output used are saved with the model 
+% 
+% % Test on x% of the data
+% percts = (210-[30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180])./210;
+% %%
+% for i = 1:numel(percts)
+%     percent = percts(i); % Testing percent
+%     [mdl, In_test, Out_test] = trainGP_genpwr(data, percent);
+%     save("GenPwrGP_"+num2str(1-percent)+"mdl.mat",'mdl');
+%     save("GenPwrGP_"+num2str(1-percent)+"In_test.mat",'In_test')
+%     save("GenPwrGP_"+num2str(1-percent)+"Out_test.mat",'Out_test')
+% end
+% 
+% %% Visualize Results
+% 
+% % for each level of training; produce
+% % - plot of the predicted vs true with conf ints
+% % -- Save as a figure 
+% % - a value for the rmse 
+% % Test the model
+% 
+% trainpercs = 1-percts;
+% err = zeros(1,numel(trainpercs));
+% for j =1:numel(trainpercs)
+%     trainperc = trainpercs(j);
+%     model = load("GenPwrGP_"+num2str(trainperc)+"mdl.mat","mdl");
+%     model = model.mdl;
+%     In_test = load("GenPwrGP_"+num2str(trainperc)+"In_test.mat","In_test");
+%     In_test = In_test.In_test;
+%     Out_test = load("GenPwrGP_"+num2str(trainperc)+"Out_test.mat","Out_test");
+%     Out_test = Out_test.Out_test;
+% 
+%     Out_predict=predict_ppgasp(model,In_test);
+% 
+%     % Only display some of the data
+% 
+%     % Want to show 50 points
+%     p=1-30/numel(Out_test);% percent of testing points to leave out
+%     if p <0;p=1;end
+%     plotpart = cvpartition(numel(Out_predict.mean(:,1)),'HoldOut',p);
+% 
+%     % Later, we might consider using the zgp to account for the upper limit
+%     % of 5MW for power
+%     [Outsort, predictInd] = sort(Out_test);
+%     figure
+%     hold on 
+%     scatter(1:numel(Outsort(training(plotpart),1)),...
+%         Out_predict.mean(predictInd(training(plotpart),:)),'filled')
+% 
+%     scatter(1:numel(Outsort(training(plotpart),:)),...
+%         Out_test(predictInd(training(plotpart),:)),'filled')
+% 
+%     lower = Out_predict.lower95(predictInd(training(plotpart),:));
+%     upper = Out_predict.upper95(predictInd(training(plotpart),:));
+%     for i =1:numel(lower)
+%         plot([i,i],[lower(i),upper(i)],"Color",'k')
+%     end
+%     ylabel("Generator Power")
+%     xlabel("Testing Points Indexed by Value")
+%     legend("Predicted","True","95% Confidence Interval",Location="southeast")
+%     title("Generator Power GP: Training Points = "...
+%         +num2str(numel(data(:,1))*trainperc)+", Showing "...
+%         +num2str(numel(Out_test(training(plotpart),:)))+" Testing Points")
+% 
+%     err(j) = rms(Out_predict.mean-Out_test);
+%     count = 0;
+%     for k = 1:numel(Out_test)
+%         if Out_predict.mean(k) > Out_test(k)-2*Out_predict.sd(i)
+%             if Out_predict.mean(k) < Out_test(k)+2*Out_predict.sd(i)
+%                 count = count+1;
+%             end
+%         end
+%     end
+%     coverage(j) = count/numel(Out_test);
+% end
+% %% Plot the RMSE for each model as a bargraph
+% figure
+% bar(trainpercs,err)
+% title("RMSE vs Training Percent of Data")
+% grid on
+% % Save as a figure
+% %% Plot the percent of predicted in 95% confidence
+% figure
+% bar(trainpercs,coverage(1:numel(trainpercs)))
+% title("95% Coverage vs Training Percent of Data")
+% grid on 
+% %% Examine the PPGPs ability to emulate all of the promising quantities at once
+% 
+% % Extract the features we want to use.
+% % Read in the selected predictors
+% predimpID = "../MachineLearning/Classification_imp.txt";
+% Importances=readmatrix(predimpID);
+% % We will use the first 8 most important variables 
+% numvars = 8;
+% % Percent of data to put towards testing
+% percent = (210-170)/210;
+% % Grab the columns for testing and training 
+% [In_train,Out_train,In_test,Out_test,targets] = PPGP_dataprep(numvars,Importances,data,percent);
+% 
+% % Note, several of these variables are range limited.
+% 
+% % Write a function which takes in the original values and returns the 
+% % values given by zGP imputation 
+% zGP_cols = [2,6,7,8];
+% lim_types = ["lower","lower","lower","upper"];
+% zGP_outs = zeros(numel(Out_train(:,1)),numel(zGP_cols));
+% zGP_scale = zeros(numel(zGP_cols),1);
+% zGP_shift = zeros(numel(zGP_cols),1);
+% yRLs = zeros(numel(In_train(:,1)),numel(zGP_cols));
+% 
+% %% Impute zGP values for the desired columns
+% for i =1:numel(zGP_cols)
+%     output = Out_train(:,zGP_cols(i));
+%     [zGP_outs(:,i), zGP_scale(i), zGP_shift(i), yRLs(:,i)] = zGP_process2(output,...
+%         In_train, lim_types(i));
+% end
+% 
+% %% Fix the Training Ouputs
+% Out_train(:,zGP_cols) = zGP_outs;
+% 
+% %options.trend=[ones(numel(Out_train(:,1)),numvars)  In_train];
+% %options.zero_mean  = false; 
+% %options.nugget_est = false;
+% 
+% % At last, the model
+% modelPPzGP=ppgasp(In_train,Out_train);
+% % Create an object which we can save which has all of the pieces that we
+% % need:
+% 
+% %%
+% PP_GP.model = modelPPzGP;
+% PP_GP.In_test = In_test;
+% PP_GP.In_train = In_train;
+% PP_GP.Out_test = Out_test;
+% PP_GP.Out_train = Out_train;
+% PP_GP.numvars = numvars;
+% PP_GP.scaling_factors = zGP_scale;
+% PP_GP.zGP_index = zGP_cols;
+% PP_GP.lim_types = lim_types;
+% PP_GP.target_vars = targets;
+% PP_GP.zGP_shift = zGP_shift;
+% PP_GP.yRLs = yRLs;
+% % Save this object
+% save("PP_zGP"+num2str(1-percent)+"package.mat",'PP_GP');
 
 %% Visualize the results
 mdl_id = "PP_zGP"+num2str((170/210))+"package.mat";
@@ -183,147 +183,147 @@ yRLs = PP_GP.yRLs;
 %% Also, write a function which can predict and correct the output of the
 % function after doing zGP 
 Out_predict = predicted_outputs2(modelPPzGP, In_test, numvars, zGP_scale, zGP_cols, lim_types, zGP_shift, yRLs, In_train);
-
-for j = 8:numvars
-    figure
-    subplot(1,2,1)
-    [Outsort, predictInd] = sort(Out_test(:,j));
-    hold on 
-    predict = Out_predict.mean(predictInd,j);
-    % Number of Points to show
-    points = 25;
-    p = points/numel(Outsort);
-    if p > 1;p = .9;end
-    cvpart = cvpartition(numel(Outsort),'HoldOut',p);
-
-    scatter(1:numel(Outsort(test(cvpart))),predict(test(cvpart)),'filled')
-    
-    scatter(1:numel(Outsort(test(cvpart))),Outsort(test(cvpart)),'filled')
-    
-    lower = Out_predict.mean(predictInd(test(cvpart)),j)-2*Out_predict.sd(predictInd(test(cvpart)),j);
-    upper = Out_predict.mean(predictInd(test(cvpart)),j)+2*Out_predict.sd(predictInd(test(cvpart)),j);
-    for i =1:numel(predict(test(cvpart)))
-        plot([i,i],[lower(i),upper(i)],"Color",'k')
-    end
-    xlabel("Indexed by True "+targets(j)+" value")
-    ylabel(targets(j))
-    legend("Predicted","True","95% Confidence Interval",Location="southeast")
-    title(targets(j)+" Points = "+num2str(numel(predictInd(test(cvpart)))))
-    subplot(1,2,2)
-    hold on
-    scatter(Outsort,predict,'filled')
-    ylabel('predicted')
-    xlabel('true')
-    title("Scatter Plot True vs Predicted "+targets(j))
-    plot([min(min(predict),min(Outsort)),max(max(predict),max(Outsort))],[min(min(predict),min(Outsort)),max(max(predict),max(Outsort))],'red')
-    count = 0;
-    for k = 1:numel(Out_test(:,j))
-        
-        if Out_test(k,j) > Out_predict.mean(k,j)-2*Out_predict.sd(k,j)
-            if  Out_test(k,j) < Out_predict.mean(k,j)+2*Out_predict.sd(k,j)
-                count = count+1;
-                disp([k, count])
-            end
-        end
-    end
-    counts(j) = count;
-    S = sum((Out_test(:,j)-Out_predict.mean(:,j)).*(Out_test(:,j)-Out_predict.mean(:,j)));
-    Nrmse(j) = sqrt(S/numel(Out_test(:,j)))/(max(Out_test(:,j))-min((Out_test(:,j))));
-end
-
-for i = 1:numel(Out_test(1,:))
-    disp('Percent of '+targets(i)+' Predicted within Conf. Int. =  '+num2str(100*counts(i)/numel(predict)))
-end
-
-for i = 1:numel(Out_test(1,:))
-    disp('Normalized RMSE of '+targets(i)+' = '+num2str(Nrmse(i)))
-end
+% 
+% for j = 8:numvars
+%     figure
+%     subplot(1,2,1)
+%     [Outsort, predictInd] = sort(Out_test(:,j));
+%     hold on 
+%     predict = Out_predict.mean(predictInd,j);
+%     % Number of Points to show
+%     points = 25;
+%     p = points/numel(Outsort);
+%     if p > 1;p = .9;end
+%     cvpart = cvpartition(numel(Outsort),'HoldOut',p);
+% 
+%     scatter(1:numel(Outsort(test(cvpart))),predict(test(cvpart)),'filled')
+% 
+%     scatter(1:numel(Outsort(test(cvpart))),Outsort(test(cvpart)),'filled')
+% 
+%     lower = Out_predict.mean(predictInd(test(cvpart)),j)-2*Out_predict.sd(predictInd(test(cvpart)),j);
+%     upper = Out_predict.mean(predictInd(test(cvpart)),j)+2*Out_predict.sd(predictInd(test(cvpart)),j);
+%     for i =1:numel(predict(test(cvpart)))
+%         plot([i,i],[lower(i),upper(i)],"Color",'k')
+%     end
+%     xlabel("Indexed by True "+targets(j)+" value")
+%     ylabel(targets(j))
+%     legend("Predicted","True","95% Confidence Interval",Location="southeast")
+%     title(targets(j)+" Points = "+num2str(numel(predictInd(test(cvpart)))))
+%     subplot(1,2,2)
+%     hold on
+%     scatter(Outsort,predict,'filled')
+%     ylabel('predicted')
+%     xlabel('true')
+%     title("Scatter Plot True vs Predicted "+targets(j))
+%     plot([min(min(predict),min(Outsort)),max(max(predict),max(Outsort))],[min(min(predict),min(Outsort)),max(max(predict),max(Outsort))],'red')
+%     count = 0;
+%     for k = 1:numel(Out_test(:,j))
+% 
+%         if Out_test(k,j) > Out_predict.mean(k,j)-2*Out_predict.sd(k,j)
+%             if  Out_test(k,j) < Out_predict.mean(k,j)+2*Out_predict.sd(k,j)
+%                 count = count+1;
+%                 disp([k, count])
+%             end
+%         end
+%     end
+%     counts(j) = count;
+%     S = sum((Out_test(:,j)-Out_predict.mean(:,j)).*(Out_test(:,j)-Out_predict.mean(:,j)));
+%     Nrmse(j) = sqrt(S/numel(Out_test(:,j)))/(max(Out_test(:,j))-min((Out_test(:,j))));
+% end
+% 
+% for i = 1:numel(Out_test(1,:))
+%     disp('Percent of '+targets(i)+' Predicted within Conf. Int. =  '+num2str(100*counts(i)/numel(predict)))
+% end
+% 
+% for i = 1:numel(Out_test(1,:))
+%     disp('Normalized RMSE of '+targets(i)+' = '+num2str(Nrmse(i)))
+% end
 
 %% Compare predictions with another dataset
 
 % Extract the columns we use to make the predictions
-Importances = readmatrix("..\MachineLearning\Classification_imp.txt");
-T = readtable("..\Exp2_inTable.txt");
-In_test = T(:,[1,2,3,5:10]).Variables;
-Out_predict = predicted_outputs2(modelPPzGP, In_test, numvars, zGP_scale, zGP_cols, lim_types,zGP_shift,yRLs,In_train);
-r_id = "../Data/Exp2/LARGE2ExperimentResultTable500.txt";
-r_data = readtable(r_id);
-suffixes = {"mean","sd","skew","kurt"};
-names = {"RootMxb1", "TipALxb1", "B1N6Cl", "B1N6Cd", "GenPwr"};
-
-iter = 1;
-for i = 1:numel(suffixes)
-    for j = 1:numel(names)
-        a = names{j}+suffixes{i};
-        varnames(iter) = a;
-        iter = iter + 1;
-    end
-end
-
-others = {"WindDirection","WindSpeed","AirDensity"};
-for i =1:numel(others)
-    a = others{i};
-    varnames(iter) = a;
-    iter = iter +1;
-end
-
-targets = varnames(Importances(1:numvars));
-
-Out_test = r_data(:,targets).Variables;
+% Importances = readmatrix("..\MachineLearning\Classification_imp.txt");
+% T = readtable("..\Exp2_inTable.txt");
+% In_test = T(:,[1,2,3,5:10]).Variables;
+% Out_predict = predicted_outputs2(modelPPzGP, In_test, numvars, zGP_scale, zGP_cols, lim_types,zGP_shift,yRLs,In_train);
+% r_id = "../Data/Exp2/LARGE2ExperimentResultTable500.txt";
+% r_data = readtable(r_id);
+% suffixes = {"mean","sd","skew","kurt"};
+% names = {"RootMxb1", "TipALxb1", "B1N6Cl", "B1N6Cd", "GenPwr"};
+% 
+% iter = 1;
+% for i = 1:numel(suffixes)
+%     for j = 1:numel(names)
+%         a = names{j}+suffixes{i};
+%         varnames(iter) = a;
+%         iter = iter + 1;
+%     end
+% end
+% 
+% others = {"WindDirection","WindSpeed","AirDensity"};
+% for i =1:numel(others)
+%     a = others{i};
+%     varnames(iter) = a;
+%     iter = iter +1;
+% end
+% 
+% targets = varnames(Importances(1:numvars));
+% 
+% Out_test = r_data(:,targets).Variables;
 %%
-for j = 1:numvars
-    f = figure;
-    f.Position = [100 100 800 500];
-    subplot(1,2,1)
-    [Outsort, predictInd] = sort(Out_test(:,j));
-    hold on 
-    predict = Out_predict.mean(predictInd,j);
-    % Number of Points to show
-    points = 25;
-    p = points/numel(Outsort);
-    if p > 1;p = .9;end
-    cvpart = cvpartition(numel(Outsort),'HoldOut',p);
-
-    scatter(1:numel(Outsort(test(cvpart))),predict(test(cvpart)),'filled')
-    
-    scatter(1:numel(Outsort(test(cvpart))),Outsort(test(cvpart)),'filled')
-    
-    lower = Out_predict.mean(predictInd(test(cvpart)),j)-2*Out_predict.sd(predictInd(test(cvpart)),j);
-    upper = Out_predict.mean(predictInd(test(cvpart)),j)+2*Out_predict.sd(predictInd(test(cvpart)),j);
-    for i =1:numel(predict(test(cvpart)))
-        plot([i,i],[lower(i),upper(i)],"Color",'k')
-    end
-    xlabel("Indexed by True "+targets(j)+" value")
-    ylabel(targets(j))
-    legend("Predicted","True","95% Confidence Interval",Location="southeast")
-    title(targets(j)+" Points = "+num2str(numel(predictInd(test(cvpart)))))
-    subplot(1,2,2)
-    hold on
-    scatter(Outsort,predict,'filled')
-    ylabel('predicted')
-    xlabel('true')
-    title("Scatter Plot True vs Predicted "+targets(j))
-    plot([min(min(predict),min(Outsort)),max(max(predict),max(Outsort))],[min(min(predict),min(Outsort)),max(max(predict),max(Outsort))],'red')
-    count = 0;
-    for k = 1:numel(Out_test(:,j))
-        if Out_predict.mean(k,j) > Out_test(k,j)-2*Out_predict.sd(i,j)
-            if Out_predict.mean(k,j) < Out_test(k,j)+2*Out_predict.sd(i,j)
-                count = count+1;
-            end
-        end
-    end
-    counts(j) = count;
-    S = sum((Out_test(:,j)-Out_predict.mean(:,j)).*(Out_test(:,j)-Out_predict.mean(:,j)));
-    Nrmse(j) = sqrt(S/numel(Out_test(:,j)))/(max(Out_test(:,j))-min((Out_test(:,j))));
-end
-
-for i = 1:numel(Out_test(1,:))
-    disp('Percent of '+targets(i)+' Predicted within Conf. Int. =  '+num2str(100*counts(i)/numel(predict)))
-end
-
-for i = 1:numel(Out_test(1,:))
-    disp('Normalized RMSE of '+targets(i)+' = '+num2str(Nrmse(i)))
-end
+% for j = 1:numvars
+%     f = figure;
+%     f.Position = [100 100 800 500];
+%     subplot(1,2,1)
+%     [Outsort, predictInd] = sort(Out_test(:,j));
+%     hold on 
+%     predict = Out_predict.mean(predictInd,j);
+%     % Number of Points to show
+%     points = 25;
+%     p = points/numel(Outsort);
+%     if p > 1;p = .9;end
+%     cvpart = cvpartition(numel(Outsort),'HoldOut',p);
+% 
+%     scatter(1:numel(Outsort(test(cvpart))),predict(test(cvpart)),'filled')
+% 
+%     scatter(1:numel(Outsort(test(cvpart))),Outsort(test(cvpart)),'filled')
+% 
+%     lower = Out_predict.mean(predictInd(test(cvpart)),j)-2*Out_predict.sd(predictInd(test(cvpart)),j);
+%     upper = Out_predict.mean(predictInd(test(cvpart)),j)+2*Out_predict.sd(predictInd(test(cvpart)),j);
+%     for i =1:numel(predict(test(cvpart)))
+%         plot([i,i],[lower(i),upper(i)],"Color",'k')
+%     end
+%     xlabel("Indexed by True "+targets(j)+" value")
+%     ylabel(targets(j))
+%     legend("Predicted","True","95% Confidence Interval",Location="southeast")
+%     title(targets(j)+" Points = "+num2str(numel(predictInd(test(cvpart)))))
+%     subplot(1,2,2)
+%     hold on
+%     scatter(Outsort,predict,'filled')
+%     ylabel('predicted')
+%     xlabel('true')
+%     title("Scatter Plot True vs Predicted "+targets(j))
+%     plot([min(min(predict),min(Outsort)),max(max(predict),max(Outsort))],[min(min(predict),min(Outsort)),max(max(predict),max(Outsort))],'red')
+%     count = 0;
+%     for k = 1:numel(Out_test(:,j))
+%         if Out_predict.mean(k,j) > Out_test(k,j)-2*Out_predict.sd(i,j)
+%             if Out_predict.mean(k,j) < Out_test(k,j)+2*Out_predict.sd(i,j)
+%                 count = count+1;
+%             end
+%         end
+%     end
+%     counts(j) = count;
+%     S = sum((Out_test(:,j)-Out_predict.mean(:,j)).*(Out_test(:,j)-Out_predict.mean(:,j)));
+%     Nrmse(j) = sqrt(S/numel(Out_test(:,j)))/(max(Out_test(:,j))-min((Out_test(:,j))));
+% end
+% 
+% for i = 1:numel(Out_test(1,:))
+%     disp('Percent of '+targets(i)+' Predicted within Conf. Int. =  '+num2str(100*counts(i)/numel(predict)))
+% end
+% 
+% for i = 1:numel(Out_test(1,:))
+%     disp('Normalized RMSE of '+targets(i)+' = '+num2str(Nrmse(i)))
+% end
 %% Official Plots
 % targets1 = ["Drag Coefficient Mean ","Drag Coefficient Standard Deviation",...
 %     "Lift Coefficient Mean",...
@@ -438,7 +438,7 @@ grid minor
 xlim([5,18])
 ylim([-0.50,6])
 saveID = "Plots/PPzGP_powercurvewither.png";
-print('-dpng',saveID)
+%print('-dpng',saveID)
 %% Make a MeshGrid of the Predictions
 f = figure;
 f.Position = [50 50 850 650];
@@ -507,7 +507,7 @@ ylim([3,25])
 %print('-dpng',saveID)
 %% Now investigate the air density and wind direction effects 
 f = figure;
-f.Position = [50 50 1300 600];
+f.Position = [50 50 1200 700];
 addpath("..\erosionfuncs\")
 subplot(1,5,1:3)
 s = 5;
@@ -535,7 +535,7 @@ g = gca();
 legend(lgd,'location','southeast','Interpreter','latex','FontName','Helvetica')
 ylabel("Generator power (MW)",'Interpreter','latex','FontName','Helvetica')
 xlabel("Wind speed $(ms^{-1})$",'Interpreter','latex','FontName','Helvetica')
-g.FontSize = 14;
+g.FontSize = 20;
 grid on
 
 xlim([5,18])
@@ -576,7 +576,7 @@ ylim([-0.50,6]);%ylim([1500/1000, 4500/1000])
 xlim([-16,16])
 xlabel("Wind direction $(^{\circ})$",'Interpreter','latex','FontName','Helvetica')
 set(g,'yticklabels',[])
-g.FontSize = 14;g.YLabel=[];
+g.FontSize = 20;g.YLabel=[];
 grid on
 %grid minor
 
