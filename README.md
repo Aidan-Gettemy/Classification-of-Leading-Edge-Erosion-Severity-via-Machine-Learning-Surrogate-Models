@@ -10,10 +10,12 @@ In the article, Table 5 in Section 3 includes 5 main experiments. The data to re
 In order to run the scripts, a version of the OpenFAST driver must be placed in the main folder. The current projects developed by NREL as part of the OpenFAST software package can be found [here](https://github.com/openfast). A version of the driver code must be placed in the main folder. The reference wind turbine can be found [here](https://github.com/OpenFAST/r-test/tree/main/glue-codes/openfast). A version of the ROBUSTGASP code for Matlab needs to be placed in the PPGP_ROM folder, this can be found at [RobustGasp](https://github.com/mengyanggu/robustgasp-in-matlab). Also, a version of zGP is required in the same folder. The version included in this script is simply a slightly modified version of the one found at [zGP](https://github.com/SideofMan/zGP)[^1]. Finally, Reference Wind Turbine files (such as NREL5MW RWT) are found [here](https://github.com/OpenFAST/r-test/tree/main/glue-codes/openfast).
 
 ## Reproducing results from the paper
-1. Experiment 1: Global sensitivity analysis (Morris Method analysis). Run code: `Exp1Inputs.m`, `Exp1Driver.m`, `Exp1AnalysisFeatures.m`, `Exp1PlotData.m`, `Exp1ReportResults.m`. For Morris Method, run `ElementaryEffects_Analysis.ipynb`. Requires Morris Inputs found in **Morris_Inputs.txt**, and simulator result table found in **Data/Exp1/LARGE2ExperimentResultTable1.txt**. Results found in Table2 and Table3 are not used. To run `Exp1ReportResults.m` requires **MorrisResultsAnalysisTable1.parquet**.
-2. Experiment 2: Primary wind turbine erosion experiment. `Exp2Inputs.m`, `Exp2Driver.m`, `Exp2PlotData.m`, `Exp2AnalysisFeatures.m`. Dataset found in **Data/Exp2/LARGE2ExperimentResultTable500.txt**.
-3. Experiment 3: PPzGP training. `Exp3Inputs.m`, `Exp3Driver.m`, `Exp3PlotData.m`, `Exp3AnalysisFeatures.m`. Dataset found in **Data/Exp3/LARGE2ExperimentResultsTable1_210.txt**.
+1. Experiment 1: Global sensitivity analysis (Morris Method analysis).
+- Run code: `Exp1Inputs.m`, `Exp1Driver.m`, `Exp1AnalysisFeatures.m`, `Exp1PlotData.m`, `Exp1ReportResults.m`. For Morris Method, run `ElementaryEffects_Analysis.ipynb`. Requires Morris Inputs found in **Morris_Inputs.txt**, and simulator result table found in **Data/Exp1/LARGE2ExperimentResultTable1.txt**. Results found in Table2 and Table3 are not used. To run `Exp1ReportResults.m` requires **MorrisResultsAnalysisTable1.parquet**.
+3. Experiment 2: Primary wind turbine erosion experiment. `Exp2Inputs.m`, `Exp2Driver.m`, `Exp2PlotData.m`, `Exp2AnalysisFeatures.m`. Dataset found in **Data/Exp2/LARGE2ExperimentResultTable500.txt**.
+4. Experiment 3: PPzGP training. `Exp3Inputs.m`, `Exp3Driver.m`, `Exp3PlotData.m`, `Exp3AnalysisFeatures.m`. Dataset found in **Data/Exp3/LARGE2ExperimentResultsTable1_210.txt**.
 
+## Reproducing figures
 To recreate Figure #1 in the paper, run 'BladeProfilePlot.m'.
 To bypass data generation and recreate Figure #3 in the paper, run `Exp1ReportResults.m`.
 
