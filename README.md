@@ -2,7 +2,9 @@
 Contained in this repository are the (1) files and (2) data for the article "Classification of Leading Edge Erosion Severity via Machine Learning Surrogate Models" by Aidan Gettemy, Susan Minkoff, John Zweck, and Elaine Spiller. The input and driver files can be adapted for general OpenFAST experiments using MATLAB to read, write, and run .fst files.   
 
 # Scripts and data
-In the main folder, scripts are titled *Inputs, *Driver, *PlotData, *AnalysisFeatures. The first type of script assembles a table to run a batch of experiments. The next script runs the experiment itself, generating a file to keep track of the progress. The final two types of scripts plot the data from an experiment or do other post-processing and visualization tasks. The majority of the studies can be performed within MATLAB. Only the Global sensitivity analysis (Section 2.3 and 4.1) requires Python. 
+In the main folder, scripts are titled *Inputs, *Driver, *PlotData, *AnalysisFeatures. The first type of script assembles a table to run a batch of experiments. The next script runs the experiment itself, generating a file to keep track of the progress. The final two types of scripts plot the data from an experiment or do other post-processing and visualization tasks. The majority of the studies can be performed within MATLAB. 
+
+Only the Global sensitivity analysis (Section 2.3 and 4.1) requires Python. 
 
 # Paper Experiments 
 In the article, Table 5 in Section 3 includes 5 main experiments. The data to reproduce those results are shared here, as well as the code for analysis and figure reproduction.
