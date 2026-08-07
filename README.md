@@ -1,13 +1,16 @@
 # README
-In this repository, there are two main components: (1) Files and data for the article "Classification of Leading Edge Erosion Severity via Machine Learning Surrogate Models", (2) a Template for OpenFAST experiments. 
+Contained in this repository are the (1) files and (2) data for the article "Classification of Leading Edge Erosion Severity via Machine Learning Surrogate Models" by Aidan Gettemy, Susan Minkoff, John Zweck, and Elaine Spiller. The input and driver files can be adapted for general OpenFAST experiments using MATLAB to read, write, and run .fst files.   
 
 # Scripts and data
-In the main folder, scripts are titled *Inputs, *Driver, *PlotData, *AnalysisFeatures. The first type of script assembles a table to run a batch of experiments. The next script runs the experiment itself, generating a file to keep track of the progress. The final two types of scripts plot the data from an experiment or do other post-processing and visualization tasks. The first experiment pertains to sensitivity analysis, the second experiment pertains to the simulated test dataset, the final set of experiments were used to train the PPzGP emulator. 
+In the main folder, scripts are titled *Inputs, *Driver, *PlotData, *AnalysisFeatures. The first type of script assembles a table to run a batch of experiments. The next script runs the experiment itself, generating a file to keep track of the progress. The final two types of scripts plot the data from an experiment or do other post-processing and visualization tasks. The majority of the studies can be performed within MATLAB. Only the Global sensitivity analysis (Section 2.3 and 4.1) requires Python. 
+
+# Paper Experiments 
+In the article, Table 5 in Section 3 includes 5 main experiments. The data to reproduce those results are shared here, as well as the code for analysis and figure reproduction.
 
 In order to run the scripts, a version of the OpenFAST driver must be placed in the main folder. The current projects developed by NREL as part of the OpenFAST software package can be found [here](https://github.com/openfast). A version of the driver code must be placed in the main folder. The reference wind turbine can be found [here](https://github.com/OpenFAST/r-test/tree/main/glue-codes/openfast). A version of the ROBUSTGASP code for Matlab needs to be placed in the PPGP_ROM folder, this can be found at [RobustGasp](https://github.com/mengyanggu/robustgasp-in-matlab). Also, a version of zGP is required in the same folder. The version included in this script is simply a slightly modified version of the one found at [zGP](https://github.com/SideofMan/zGP)[^1]. Finally, Reference Wind Turbine files (such as NREL5MW RWT) are found [here](https://github.com/OpenFAST/r-test/tree/main/glue-codes/openfast).
 
 ## Reproducing results from the paper
-1. Experiment 1: Morris Method analysis. Run code: `Exp1Inputs.m`, `Exp1Driver.m`, `Exp1AnalysisFeatures.m`, `Exp1PlotData.m`, `Exp1ReportResults.m`. For Morris Method, run `ElementaryEffects_Analysis.ipynb`. Requires Morris Inputs found in **Morris_Inputs.txt**, and simulator result table found in **Data/Exp1/LARGE2ExperimentResultTable1.txt**. Results found in Table2 and Table3 are not used. To run `Exp1ReportResults.m` requires **MorrisResultsAnalysisTable1.parquet**.
+1. Experiment 1: Global sensitivity analysis (Morris Method analysis). Run code: `Exp1Inputs.m`, `Exp1Driver.m`, `Exp1AnalysisFeatures.m`, `Exp1PlotData.m`, `Exp1ReportResults.m`. For Morris Method, run `ElementaryEffects_Analysis.ipynb`. Requires Morris Inputs found in **Morris_Inputs.txt**, and simulator result table found in **Data/Exp1/LARGE2ExperimentResultTable1.txt**. Results found in Table2 and Table3 are not used. To run `Exp1ReportResults.m` requires **MorrisResultsAnalysisTable1.parquet**.
 2. Experiment 2: Primary wind turbine erosion experiment. `Exp2Inputs.m`, `Exp2Driver.m`, `Exp2PlotData.m`, `Exp2AnalysisFeatures.m`. Dataset found in **Data/Exp2/LARGE2ExperimentResultTable500.txt**.
 3. Experiment 3: PPzGP training. `Exp3Inputs.m`, `Exp3Driver.m`, `Exp3PlotData.m`, `Exp3AnalysisFeatures.m`. Dataset found in **Data/Exp3/LARGE2ExperimentResultsTable1_210.txt**.
 
@@ -15,7 +18,6 @@ To recreate Figure #1 in the paper, run 'BladeProfilePlot.m'.
 To bypass data generation and recreate Figure #3 in the paper, run `Exp1ReportResults.m`.
 
 ## Machine Learning
-
 To bypass data generation and recreate Figure #4 in the paper, run `RandomForest/FeatureSelection.m` up to line 132.
 
 To bypass data generation and recreate Figures #5 and #6 in the paper, run `PPGP_ROM/PPGP_Train_Test.m' from line 166. To explore GP fitting, uncomment lines 9 - 165. 
@@ -25,14 +27,12 @@ To bypass data generation and recreate Figure #7 and #8 in the paper, run 'Rando
 Note, the inputs for the GP to create the emulator training dataset are found in **Exp4_inTable.txt**. The resulting emulator training dataset is found in **EmulationDataset.txt**.
 
 # Template for OpenFAST Experimentation
-
 Below is a description of the template for automating the set-up of OpenFAST experiments in MATLAB. 
 
 This library provides a template for managing experiments with the OpenFAST [OpenFAST](https://github.com/OpenFAST/openfast?tab=readme-ov-file) simulation tool using MATLAB.  This code is a general template, fit to be modified for many different experiments.
 
 # Description:
-
-This library/framework sets up experiments with OpenFAST by changing the input files in the appropriatly.  With a large number of inputs, selecting only those pertinent to a particular study is difficult.  This library is a flexible approach for running experiments.  It separates the structuring of the experimental design and the analysis of the results from the editing of the input files.  It is modular, using helper functions which can be adapted to handle different input file types, enabling this framework to apply to different turbine setups and experiment designs.
+This library/framework sets up experiments with OpenFAST by changing the input files in the appropriately.  With a large number of inputs, selecting only those pertinent to a particular study is difficult.  This library is a flexible approach for running experiments.  It separates the structuring of the experimental design and the analysis of the results from the editing of the input files.  It is modular, using helper functions which can be adapted to handle different input file types, enabling this framework to apply to different turbine setups and experiment designs.
 
 The core of the library are two files.
 - `ExpTableGenerator.m`
@@ -136,5 +136,7 @@ Now we have gone through what each file does.  Hopefully this is clear enough to
 - Run `ExpDriver.m` to set up the `Simulate` folder and run OpenFAST on each test, gathering up the results from all the tests into a data table, before moving the data table and the `StatusFile.txt` to the experiment folder within the `Data` folder.
 
 Now the experiment is finished, and the results are organized for analysis.
+
+The authors of this script are grateful to Todd Griffith for the initial suggestion for the project and guidance in wind turbine engineering and Ipsita Mishra for her discussions and introductions to wind turbine modeling and OpenFAST software and development. 
 
 [^1]: Seidman, J.: SideofMan/zGP: zGP in R v1.0.0, https://doi.org/10.5281/zenodo.17956672, 2025.
