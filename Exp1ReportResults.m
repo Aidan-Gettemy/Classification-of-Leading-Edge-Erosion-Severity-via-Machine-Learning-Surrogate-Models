@@ -237,4 +237,98 @@ end
 
 saveID = "Plots/"+"MorrisPlotsNEW.pdf";
 ax = gcf;
-exportgraphics(ax,saveID,'Resolution',300)
+%exportgraphics(ax,saveID,'Resolution',300)
+
+%% Upgraded Plotting:
+%% Improved Morris Plot Figure
+
+% --- Colorblind-friendly colors (consistent across panels)
+colors = lines(5);
+shapes = ["o","diamond",">","square","hexagram"];
+% --- Panel labels instead of titles
+panel_lbls = ["(a)","(b)","(c)","(d)","(e)"];
+
+% --- Shortened variable names
+% var_lbls = {"Erosion", "Dir", "U", "rho", "Shear"};
+var_lbls = {"Erosion", "Wind direction", "Wind speed", "Air density", "Wind shear"};
+f = figure;
+f.Position = [50 50 1000 600];
+
+tiledlayout(2,3,"TileSpacing","compact","Padding","compact")
+
+for i = 1:5
+    
+    ax = nexttile;
+    hold on
+    
+    for j = 1:5
+        scatter(mus(i,j),sigma(i,j),100,...
+            'filled',...
+            'Marker',shapes(j),...
+            'MarkerEdgeColor','k',...
+            'MarkerFaceColor',colors(j,:),... % <-- COLOR ADDED
+            'LineWidth',1.5);
+    end
+    
+    grid on
+    
+    % --- Panel label (instead of title)
+    text(0.02,0.95,panel_lbls(i),...
+        'Units','normalized',...
+        'FontSize',16,...
+        'FontName','Helvetica',...
+        'VerticalAlignment','top');
+    
+    % --- Axis limits
+    xlim([0.001, 1.3])
+    ylim([0.001,1])
+    
+    set(gca,'XScale','log','YScale','log')
+    % --- Add more log ticks
+    ax.XTick = [0.001 0.003 0.01 0.03 0.1 0.3 1];
+    ax.YTick = [0.001 0.003 0.01 0.03 0.1 0.3 1];
+    
+    % --- Only show labels where needed
+    if i >= 4
+        xlabel('\mu^*','FontSize',16)
+    end
+    if i == 1 || i == 4
+        ylabel('\sigma','FontSize',16)
+    end
+    
+    % --- Remove redundant tick labels
+    if i < 4
+        ax.XTickLabel = [];
+    end
+    if ~(i == 1 || i == 4)
+        ax.YTickLabel = [];
+    end
+    
+    ax.FontName = 'Helvetica';
+    ax.FontSize = 14;
+    
+end
+
+% --- Legend in final empty tile
+nexttile
+hold on
+for j = 1:5
+    scatter(1,5-j,100,...
+        'filled',...
+        'Marker',shapes(j),...
+        'MarkerEdgeColor','k',...
+        'MarkerFaceColor',colors(j,:),...
+        'LineWidth',1.5);
+    
+    text(1.2,5-j,var_lbls{j},...
+        'FontSize',20,...
+        'FontName','Helvetica',...
+        'VerticalAlignment','middle');
+end
+
+xlim([0 4])
+ylim([-1 6])
+axis off
+
+% --- Export
+%exportgraphics(gcf,"Plots/MorrisPlotsNEW.pdf",'Resolution',300)
