@@ -49,10 +49,10 @@ Experiment 3: PPzGP training. `Exp3Inputs.m`, `Exp3Driver.m`, `Exp3PlotData.m`, 
 - Figure #12:
 
 ## Reproducing tables
-- Table #1: [here](https://github.com/openfast)
-- Table #2: [here](https://github.com/openfast)
-- Table #3: [here](https://github.com/openfast)
-- Table #4: [here](https://github.com/openfast)
+- Table #1: OpenFAST model information found [here](https://github.com/openfast).
+- Table #2: OpenFAST model information found [here](https://github.com/openfast).
+- Table #3: OpenFAST model information found [here](https://github.com/openfast).
+- Table #4: OpenFAST model information found [here](https://github.com/openfast).
 - Table #5: Experiment Design, see paper.
 - Table #6: See `Exp3Inputs.m`
 - Table #7: timing
