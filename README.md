@@ -19,18 +19,26 @@ In order to run the scripts, a version of the OpenFAST driver must be placed in 
     - Run code: `ElementaryEffects_Analysis.ipynb` on **Data/Exp1/LARGE2ExperimentResultTable1.txt** to generate **MorrisResultsAnalysisTable1.parquet**.
     - Run code: `Exp1ReportResults.m` to generate Figure #3.
     - `Exp1PlotData.m` and `Exp1AnalysisFeatures.m` are optional, but useful to explore the dataset.
-3. Experiment 2: Classifier feature selection datasets (1 and 2)
-4. Experiment 3: Emulator Training dataset
-5. Experiment 4: Emulator Generated datasets
-6. Experiment 5: Classifier testing datasets (1 and 2)
-7. Primary wind turbine erosion experiment. `Exp2Inputs.m`, `Exp2Driver.m`, `Exp2PlotData.m`, `Exp2AnalysisFeatures.m`. Dataset found in **Data/Exp2/LARGE2ExperimentResultTable500.txt**.
-8. Experiment 3: PPzGP training. `Exp3Inputs.m`, `Exp3Driver.m`, `Exp3PlotData.m`, `Exp3AnalysisFeatures.m`. Dataset found in **Data/Exp3/LARGE2ExperimentResultsTable1_210.txt**.
+2. Experiment 2: Classifier feature selection datasets (Original Dataset and Expanded OpenFAST outputs)
+    - Run code: `Exp2Inputs.m`
+    - Run code: `Exp2Driver.m`. Specify the OpenFAST outputs using 'OutputChannels.txt' in the 'setup.m' function. Results found in **Data/**
+    - Run code:
+    - Run code: `ExpDriver.m`. Specify the OpenFAST outputs using 'OutputChannelsNew.txt' in the 'setup.m' function. Results found in **Data/**
+3. Experiment 3: Emulator Training datasets (Original Dataset and Expanded OpenFAST outputs)
+    - Run code:
+    - Run code:
+    - Run code:
+    - Run code: 
+4. Experiment 4: Emulator Generated datasets (Original Dataset and Expanded OpenFAST outputs)
+6. Experiment 5: Classifier testing datasets (Original Dataset and Expanded OpenFAST outputs)
+Primary wind turbine erosion experiment. `Exp2Inputs.m`, `Exp2Driver.m`, `Exp2PlotData.m`, `Exp2AnalysisFeatures.m`. Dataset found in **Data/Exp2/LARGE2ExperimentResultTable500.txt**.
+Experiment 3: PPzGP training. `Exp3Inputs.m`, `Exp3Driver.m`, `Exp3PlotData.m`, `Exp3AnalysisFeatures.m`. Dataset found in **Data/Exp3/LARGE2ExperimentResultsTable1_210.txt**.
 
 ## Reproducing figures
 - Figure #1: Run **New_Plot_Function.m**.
 - Figure #2: (Microsoft Power-Point, not included)
-- Figure #3: Run *Improved Morris Plot Figure* in **Exp1ReportResults.m**.
-- Figure #4: 
+- Figure #3: Run *Improved Morris Plot Figure* in **Exp1ReportResults.m**. Required data is stored in **Data/Exp1**
+- Figure #4: Run **RandomForest/Class_Predictor_selection.m** with option (A). Required data is stored in **Data/Exp2**.
 - Figure #5:
 - Figure #6:
 - Figure #7:
@@ -38,17 +46,35 @@ In order to run the scripts, a version of the OpenFAST driver must be placed in 
 - Figure #9:
 - Figure #10:
 - Figure #11:
-- Figure #12: 
-To bypass data generation and recreate Figure #3 in the paper, run `Exp1ReportResults.m`.
+- Figure #12:
+
+## Reproducing tables
+- Table #1: [here](https://github.com/openfast)
+- Table #2: [here](https://github.com/openfast)
+- Table #3: [here](https://github.com/openfast)
+- Table #4: [here](https://github.com/openfast)
+- Table #5: Experiment Design, see paper.
+- Table #6: See `Exp3Inputs.m`
+- Table #7: timing
+- Table #8: Normalized root mean square error (NRMSE) for each emulator and sensor quantity selected in Fig. 4. Values are reported as mean ± confidence interval as the percentage of the output range
+- Table #9: Empirical coverage in percent of the nominal 95% credible intervals for each output.
+- Table #10: Paired differences between the standard GP and PPzGP emulators.
+- Table #11: Wall-clock
+- Table #12: Paired differences in classifier performance between emulator-trained and simulator-trained classifiers for different emulated training-set sizes.
+- Table #13: Per-class AUC comparison between simulator-trained and emulator-trained classifier
+- Table #14: Class-wise differences between models, emulator trained minus simulator trained.
+- Table #15: Per-class recall for the emulator-trained classifier with 10,000 generated samples and the simulator-trained classifier.
+- Table #16: Class-wise recall comparison between simulator-trained and emulator-trained classifiers under noisy sensing.
+- Table #17: Additional OpenFAST output channels used in the reduced-sensing experiment.
+- Table #18: Additional time-series descriptors used in the reduced-sensing experiment.
+- Table #19: Comparison of simulator-trained and emulator-trained classifiers under the reduced-sensing experiment.
+
 
 ## Machine Learning
-To bypass data generation and recreate Figure #4 in the paper, run `RandomForest/FeatureSelection.m` up to line 132.
 
-To bypass data generation and recreate Figures #5 and #6 in the paper, run `PPGP_ROM/PPGP_Train_Test.m' from line 166. To explore GP fitting, uncomment lines 9 - 165. 
+Class predictor selection is carried out three times. 
 
-To bypass data generation and recreate Figure #7 and #8 in the paper, run 'RandomForest/kfold_fitcensemble.m'.
 
-Note, the inputs for the GP to create the emulator training dataset are found in **Exp4_inTable.txt**. The resulting emulator training dataset is found in **EmulationDataset.txt**.
 
 # Template for OpenFAST Experimentation
 Below is a description of the template for automating the set-up of OpenFAST experiments in MATLAB. 
