@@ -12,11 +12,13 @@ In the article, Table 5 in Section 3 includes 5 main experiments. The data to re
 In order to run the scripts, a version of the OpenFAST driver must be placed in the main folder. The current projects developed by NREL as part of the OpenFAST software package can be found [here](https://github.com/openfast). A version of the driver code must be placed in the main folder. The reference wind turbine can be found [here](https://github.com/OpenFAST/r-test/tree/main/glue-codes/openfast). A version of the ROBUSTGASP code for Matlab needs to be placed in the PPGP_ROM folder, this can be found at [RobustGasp](https://github.com/mengyanggu/robustgasp-in-matlab). Also, a version of zGP is required in the same folder. The version included in this script is simply a slightly modified version of the one found at [zGP](https://github.com/SideofMan/zGP)[^1]. Finally, Reference Wind Turbine files (such as NREL5MW RWT) are found [here](https://github.com/OpenFAST/r-test/tree/main/glue-codes/openfast).
 
 ## Reproducing results from the paper
-1. Experiment 1: Global sensitivity analysis (Morris Method analysis).
-    - Run code: For Morris Method, run `ElementaryEffects_Analysis.ipynb` to generate **Morris_Inputs.txt** (in **Data/Exp1**)
+1. Experiment 1: Global sensitivity analysis (Morris method analysis).
+    - Run code: `ElementaryEffects_Analysis.ipynb` to generate **Morris_Inputs.txt** (in **Data/Exp1**)
     - Run code: `Exp1Inputs.m` (runs 3 different erosion profiles, only the 1st is studied here)
-    - Run code: `Exp1Driver.m`, which will create the simulator result table found in **Data/Exp1/LARGE2ExperimentResultTable1.txt**. Results found in Table2 and Table3 are not used. Use **Data/Exp1/LARGE2ExperimentResultTable1.txt** as input to `ElementaryEffects_Analysis.ipynb` to generate the **MorrisResultsAnalysisTable1.parquet**. `Exp1ReportResults.m` requires **MorrisResultsAnalysisTable1.parquet**.
-    - Run code: `Exp1ReportResults.m` to generate Figure #3. `Exp1PlotData.m` and `Exp1AnalysisFeatures.m` are optional, but useful to explore the data.
+    - Run code: `Exp1Driver.m` to create **Data/Exp1/LARGE2ExperimentResultTable1.txt**. Results found in Table2 and Table3 are not used. Use **Data/Exp1/LARGE2ExperimentResultTable1.txt** as input to
+    - Run code: `ElementaryEffects_Analysis.ipynb` on **Data/Exp1/LARGE2ExperimentResultTable1.txt** to generate **MorrisResultsAnalysisTable1.parquet**.
+    - Run code: `Exp1ReportResults.m` to generate Figure #3.
+    - `Exp1PlotData.m` and `Exp1AnalysisFeatures.m` are optional, but useful to explore the dataset.
 3. Experiment 2: Classifier feature selection datasets (1 and 2)
 4. Experiment 3: Emulator Training dataset
 5. Experiment 4: Emulator Generated datasets
@@ -27,8 +29,8 @@ In order to run the scripts, a version of the OpenFAST driver must be placed in 
 ## Reproducing figures
 - Figure #1: Run **New_Plot_Function.m**.
 - Figure #2: (Microsoft Power-Point, not included)
-- Figure #3:
-- Figure #4:
+- Figure #3: Run *Improved Morris Plot Figure* in **Exp1ReportResults.m**.
+- Figure #4: 
 - Figure #5:
 - Figure #6:
 - Figure #7:
