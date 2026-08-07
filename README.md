@@ -13,12 +13,28 @@ In order to run the scripts, a version of the OpenFAST driver must be placed in 
 1. Experiment 1: Global sensitivity analysis (Morris Method analysis).
     - Run code: For Morris Method, run `ElementaryEffects_Analysis.ipynb` to generate **Morris_Inputs.txt** (in **Data/Exp1**)
     - Run code: `Exp1Inputs.m` (runs 3 different erosion profiles, only the 1st is studied here)
-    - Run code: `Exp1Driver.m`, `Exp1AnalysisFeatures.m`, `Exp1PlotData.m`, `Exp1ReportResults.m`. , and simulator result table found in **Data/Exp1/LARGE2ExperimentResultTable1.txt**. Results found in Table2 and Table3 are not used. To run `Exp1ReportResults.m` requires **MorrisResultsAnalysisTable1.parquet**.
-3. Experiment 2: Primary wind turbine erosion experiment. `Exp2Inputs.m`, `Exp2Driver.m`, `Exp2PlotData.m`, `Exp2AnalysisFeatures.m`. Dataset found in **Data/Exp2/LARGE2ExperimentResultTable500.txt**.
-4. Experiment 3: PPzGP training. `Exp3Inputs.m`, `Exp3Driver.m`, `Exp3PlotData.m`, `Exp3AnalysisFeatures.m`. Dataset found in **Data/Exp3/LARGE2ExperimentResultsTable1_210.txt**.
+    - Run code: `Exp1Driver.m`, which will create the simulator result table found in **Data/Exp1/LARGE2ExperimentResultTable1.txt**. Results found in Table2 and Table3 are not used. Use **Data/Exp1/LARGE2ExperimentResultTable1.txt** as input to `ElementaryEffects_Analysis.ipynb` to generate the **MorrisResultsAnalysisTable1.parquet**. `Exp1ReportResults.m` requires **MorrisResultsAnalysisTable1.parquet**.
+    - Run code: `Exp1ReportResults.m` to generate Figure #3. `Exp1PlotData.m` and `Exp1AnalysisFeatures.m` are optional, but useful to explore the data.
+3. Experiment 2: Classifier feature selection datasets (1 and 2)
+4. Experiment 3: Emulator Training dataset
+5. Experiment 4: Emulator Generated datasets
+6. Experiment 5: Classifier testing datasets (1 and 2)
+7. Primary wind turbine erosion experiment. `Exp2Inputs.m`, `Exp2Driver.m`, `Exp2PlotData.m`, `Exp2AnalysisFeatures.m`. Dataset found in **Data/Exp2/LARGE2ExperimentResultTable500.txt**.
+8. Experiment 3: PPzGP training. `Exp3Inputs.m`, `Exp3Driver.m`, `Exp3PlotData.m`, `Exp3AnalysisFeatures.m`. Dataset found in **Data/Exp3/LARGE2ExperimentResultsTable1_210.txt**.
 
 ## Reproducing figures
-To recreate Figure #1 in the paper, run 'BladeProfilePlot.m'.
+- Figure #1: Run **New_Plot_Function.m**.
+- Figure #2: (Microsoft Power-Point, not included)
+- Figure #3:
+- Figure #4:
+- Figure #5:
+- Figure #6:
+- Figure #7:
+- Figure #8:
+- Figure #9:
+- Figure #10:
+- Figure #11:
+- Figure #12: 
 To bypass data generation and recreate Figure #3 in the paper, run `Exp1ReportResults.m`.
 
 ## Machine Learning
@@ -49,7 +65,8 @@ This framework streamlines OpenFAST input-output handling and keeps the data org
 # Instructions:
 
 Note: The scripts in this folder require:
-- MatLab
+- MatLab (with Statistics and Machine Learning Toolkit)
+- Jupyter notebook (SAlib, Numpy, and Pandas)
 - RobustGasp for MatLab ([here](https://github.com/mengyanggu/robustgasp-in-matlab))
 - OpenFAST excecutable (adjust the path in the `testdriver.m` file)
 - OpenFAST controller conpiled in the correct directory ([here](https://github.com/OpenFAST/nrel-5mw-controllers))
@@ -131,6 +148,8 @@ Note, a few of the functions included in the `funcs` folder are not described th
 - `plot_multi.m`: Requires inputs, the table of time series data, the names (as formatted in the data-folders), and a table that gives what outputs to be plotted each other.
 
 Additional functions should be written as needed, especially when seeking to expand the input available to be changed.  This might require some creativity for efficient indexing and modifying, but the existing functions are good blueprints.  The most common type of addaptation is in helper functions that set up the various module files.  The changes needed to adapt the summary tables are very slight.
+
+Note, in this repository, only the processed files are saved, raw time-series data should be generated locally. 
 
 Now we have gone through what each file does.  Hopefully this is clear enough to run and recreate the results of this experiment, and to adapt this framework for one's own experimental needs.
 
