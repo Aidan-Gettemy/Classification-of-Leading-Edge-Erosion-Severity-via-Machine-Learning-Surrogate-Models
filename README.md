@@ -59,25 +59,33 @@ After the simulations on input tables **Exp1_inTable.txt**, **Exp2_inTable.txt**
 | Exp10      | **Data/Exp10/Large2noisyExperimentResultTable1_500.txt** | Exp10AnalysisFeatures | Section 4.4.1, 4.4.2 |
 | Exp10      | **Data/Exp10/Large3ExperimentResultTable1_500.txt** | Exp10AnalysisFeatures | Section 4.4.2 |
 
+## Gaussian Process Emulator training
+All of the calls needed to evaluate and test the GP modeling approaches are contained in **PPGP_ROM** and in the function **GP_training_comparison.m** For the noise experiment and non-aerodynamic sensor experiment, the files **Emulation_Trained_Classifier_Runner.m** contain the script to load and train the GP emulator. Since emulation is so cheap for a single fit (Note; all of the emulator training data is used here. Emulation training data is separate from the classifier testing data) there is no reason to load a stored model. The main expense is preparing the zGP censored data. 
+
 ### Preparing Z-censored data
 
-## Gaussian Process Emulator training
+The script **PPGP_ROM/Prepare_zcensored_data.m** performs the imputation explained in Section 2.4.3.
+
+A package of scripts for the parallel version of zGP training for MatLab is shared in **PPGP_ROM/parallel_training_zgp**. This version was used for the results in Section 4.2.1 and Section 4.2.2.
 
 ## Machine Learning
-Class predictor selection is carried out three times. 
+Class predictor selection is carried out three times using the datasets **Data/Exp2/Large2ExperimentResultTable1_500.txt**, **Data/Exp10/Large2noisyExperimentResultTable1_500.txt**, and **Data/Exp10/Large3ExperimentResultTable1_500.txt**. The target sensors are those selected as inputs for the classifier out of all of the potential sensor/time-series statistics and saved to an output file. 
+
+Predictor selection is carried out on a different dataset than the dataset used to train and test the classification algorithms using repeated k-fold cross-validation. 
 
 ### Analysis
 
-Generating a reproducible repeated k-fold cross-validation splits. 
+Generating a reproducible repeated k-fold cross-validation split is accomplished using **RandomForest/classifier_r_kfold_setup.m** which saves the sample-row indices for future experiments.
 
-**RandomForest/Emulation_Trained_Classifier_Runner.m**
+**RandomForest/Emulation_Trained_Classifier_Runner.m** trains the emulator then generates a set number of emulated sample points. A classifier is fit to the emulated data. Then it is evaluated on the simulated testing data. At last, the results are saved.
 
-**RandomForest/Simulation_Trained_Classifier_Runner.m**
+**RandomForest/Simulation_Trained_Classifier_Runner.m** loads the dataset and then uses the pre-saved repeated k-fold splits. Hyperparameter tuning is performed on the training data for each round and the prediction on the held-out split is stored. 
 
-**RandomForest/ParallelProcessing/Simulation_Trained_Classifier_Runner_parallel.m**.
+A parallel version is found in the **RandomForest/Parallel_Train_Test** folder.
 
-Finally, **RandomForest/Run_postprocessing.m**. 
+**RandomForest/ParallelProcessing/Simulation_Trained_Classifier_Runner_parallel.m** performs the same analysis in parallel on available cores.
 
+Finally, **RandomForest/Run_postprocessing.m** loads the testing data and the cross-validation results. The loading of the predictor names must be done according to how the predictors were saved for the experiment. 
 
 ## Reproducing figures
 - Figure #1: Run **New_Plot_Function.m**.
