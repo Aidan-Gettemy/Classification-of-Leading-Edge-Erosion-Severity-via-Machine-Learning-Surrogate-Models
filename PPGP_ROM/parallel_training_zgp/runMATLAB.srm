@@ -1,0 +1,22 @@
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=64
+##SBATCH --mem=30G
+#SBATCH --partition=cpu-preempt
+#SBATCH --time=01:30:00
+#SBATCH -J emulationTEST-%j
+#SBATCH -o emulationTEST-%j.out
+
+echo "Submit directory: $SLURM_SUBMIT_DIR"
+cd $SLURM_SUBMIT_DIR
+
+echo "Job ID: $SLURM_JOB_ID"
+echo "Node list: $SLURM_NODELIST"
+echo "CPUs per task: $SLURM_CPUS_PER_TASK"
+
+# Load MATLAB module if your cluster uses one
+module load matlab
+
+# Run MATLAB script
+matlab -nodisplay -nosplash -r "try, run('Emulation_Trained_Classifier_Runner.m'); catch ME, disp(getReport(ME,'extended')); exit(1); end; exit(0);"
