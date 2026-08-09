@@ -1,245 +1,277 @@
 # README
-Contained in this repository are the (1) files and (2) data for the article "Classification of Leading Edge Erosion Severity via Machine Learning Surrogate Models" by Aidan Gettemy, Susan Minkoff, John Zweck, and Elaine Spiller. The input and driver files can be adapted for general OpenFAST experiments using MATLAB to read, write, and run .fst files.   
 
-# Scripts and data
-In the main folder, scripts are titled *Inputs, *Driver, *PlotData, *AnalysisFeatures. The first type of script assembles a table to run a batch of experiments. The next script runs the experiment itself, generating a file to keep track of the progress. The final two types of scripts plot the data from an experiment or do other post-processing and visualization tasks. The majority of the studies can be performed within MATLAB. 
+This repository contains the files and data for the article *"Classification of Leading Edge Erosion Severity via Machine Learning Surrogate Models"* by Aidan Gettemy, Susan Minkoff, John Zweck, and Elaine Spiller. The input and driver files can be adapted for general OpenFAST experiments, using MATLAB to read, write, and run `.fst` files.
 
-Only the Global sensitivity analysis (Section 2.3 and 4.1) requires Python. 
+## Repository Layout
 
-Additional analysis related mainly to classification is found in the folder **RandomForest**, so called by the name of the algorithm used for classification. Additional analysis related mainly to building and testing Gaussian process emulators is found in the folder **PPGP_ROM**. 
+Scripts in the main folder follow four naming patterns:
 
-Data can be located in the **Data** folder, and the auxiliary functions are contained in **erosionfuncs** and **funcs**. 
+- `*Inputs` — assembles a table to run a batch of experiments.
+- `*Driver` — runs the experiment and generates a file to track progress.
+- `*PlotData` and `*AnalysisFeatures` — plot experiment data and perform other post-processing and visualization tasks.
 
-# Paper Experiments 
-In "Classification of Leading Edge Erosion Severity via Machine Learning Surrogate Models", Table 5 in Section 3 includes 5 main experiments. The data to reproduce those results are shared here, as well as the code for analysis and figure reproduction.
+Most studies run entirely within MATLAB. Only the global sensitivity analysis (Sections 2.3 and 4.1) requires Python.
 
-In order to run the scripts, a version of the OpenFAST software must be placed in the main folder. For the version used in the paper, consult "Classification of Leading Edge Erosion Severity via Machine Learning Surrogate Models". Newer versions may break the code. The current version of OpenFAST developed by the National Laboratory of the Rockies (NLR formerly NREL) as part of the OpenFAST software package can be found [here](https://github.com/openfast). The reference wind turbine can be found [here](https://github.com/OpenFAST/r-test/tree/main/glue-codes/openfast). A version of the ROBUSTGASP code for Matlab needs to be placed in the PPGP_ROM folder, this can be found at [RobustGasp](https://github.com/mengyanggu/robustgasp-in-matlab). Also, a version of zGP is required in the same folder. The version included in this script is simply a slightly modified version of the one found at [zGP](https://github.com/SideofMan/zGP)[^1]. Finally, Reference Wind Turbine files (such as NREL5MW RWT) are found [here](https://github.com/OpenFAST/r-test/tree/main/glue-codes/openfast).
+Key folders:
 
-## Reproducing results from the paper
-1. Experiment 1: Global sensitivity analysis (Morris method analysis).
-    - Run code: `ElementaryEffects_Analysis.ipynb` to generate **Morris_Inputs.txt**. A version of **Morris_Inputs.txt** is saved in **Data/Exp1**.
-    - Run code: `Exp1Inputs.m` (runs 3 different erosion profiles, only the 1st is used in the paper)
-    - Run code: `Exp1Driver.m`. Results found in Table2 and Table3 are not used.
-    - Run code: `ElementaryEffects_Analysis.ipynb` on **Data/Exp1/LARGE2ExperimentResultTable1.txt** to generate **MorrisResultsAnalysisTable1.parquet**. **MorrisResultsAnalysisTable1.parquet** is saved in **Data/Exp1**.
-    - Run code: `Exp1ReportResults.m` to generate Figure #3.
-    - `Exp1PlotData.m` and `Exp1AnalysisFeatures.m` are optional, but useful to explore the dataset.
-2. Experiment 2: Classifier feature selection datasets (Original Dataset and Expanded OpenFAST outputs)
-    - Run code: `Exp2Inputs.m`. This script creates a table with 500 input vectors.
-    - Run code: `Exp2Driver.m`. Specify the OpenFAST outputs using 'OutputChannels.txt' in the 'setup.m' function. Resulting table found in **Data/Exp2**.
-    - Run code: `Exp10Inputs.m`. This script creates a table with 500 input vectors.
-    - Run code: `Exp10Driver.m`. Specify the OpenFAST outputs using 'OutputChannelsNew.txt' in the 'setup.m' function. Resulting tables found in **Data/Exp10**
-3. Experiment 3: Emulator Training datasets (Original Dataset and Expanded OpenFAST outputs)
-    - Run code: `Exp3Inputs.m`. This script creates a table with 210 input vectors calibrated for GP training.
-    - Run code: `Exp3Driver.m`. Specify the OpenFAST outputs using 'OutputChannels.txt' in the 'setup.m' function. Resulting tables found in **Data/Exp3**.
-    - Run code: `Exp7Inputs.m`. This script creates a table with 420 input vectors calibrated for GP training. Note, not all samples were used in training the GP models.
-    - Run code: `Exp7Driver.m`. Specify the OpenFAST outputs using 'OutputChannelsNew.txt' in the 'setup.m' function. Resulting tables found in **Data/Exp7**.
-4. Experiment 4: Emulator Generated datasets (Original Dataset and Expanded OpenFAST outputs)
-6. Experiment 5: Classifier testing datasets (Original Dataset and Expanded OpenFAST outputs)
-    - Run code: `Exp6Inputs.m`. This script creates a table with 600 input vectors.
-    - Run code: `Exp6Driver.m`. Specify the OpenFAST outputs using 'OutputChannelsNew.txt' in the 'setup.m' function. Resulting tables found in **Data/Exp6**.
-  
-### Multiple datasets
-Additional studies were carried out in Section 4.3 and Section 4.4 which required additional simulations in order to add the features in `OutputChannelsNew.txt`. However, for continuity with the original work, datasets 2, and 3 are included and were also used in the paper.
+- **RandomForest** — classification analysis (named for the algorithm used).
+- **PPGP_ROM** — building and testing Gaussian process emulators.
+- **Data** — all experiment data.
+- **erosionfuncs** and **funcs** — auxiliary functions.
 
-All files related to the running and output of a particular experiment are found in **Data/Exp#**.
+## Setup
 
-## Processing time-series data
-After the simulations on input tables **Exp1_inTable.txt**, **Exp2_inTable.txt**, **Exp3_inTable.txt**, **Exp6_inTable.txt**, **Exp7_inTable.txt**, **Exp10_inTable.txt** are complete, additional features are calculated on the time series data and saved for each simulation output. Each table is generated by running the `AnalysisFeatures.m` file, which includes calls to the functions `combineResultsLarge`, `combineResultsLargeNoisy`, and `combineResultsLarge3`. These are some fairly standard feature extraction codes. Check the **funcs** folder for the script. Those tables are listed below as well as the section of the paper that uses them:
+To run the scripts, place a version of OpenFAST in the main folder. Use the version specified in the paper, as newer versions may break the code.
+
+| Requirement | Source |
+|-------------|--------|
+| OpenFAST (current version, from NLR — formerly NREL) | https://github.com/openfast |
+| Reference wind turbine files (e.g., NREL5MW RWT) | https://github.com/OpenFAST/r-test/tree/main/glue-codes/openfast |
+| ROBUSTGASP for MATLAB (place in **PPGP_ROM**) | https://github.com/mengyanggu/robustgasp-in-matlab |
+| zGP (place in **PPGP_ROM**) — a slightly modified version is included[^1] | https://github.com/SideofMan/zGP |
+
+## Paper Experiments
+
+Table 5 (Section 3) defines the five main experiments. The data to reproduce these results, along with the analysis and figure-reproduction code, are shared here.
+
+### Reproducing Results
+
+**Experiment 1 — Global sensitivity analysis (Morris method)**
+
+1. Run `ElementaryEffects_Analysis.ipynb` to generate **Morris_Inputs.txt** (a copy is saved in **Data/Exp1**).
+2. Run `Exp1Inputs.m` (runs 3 erosion profiles; only the 1st is used in the paper).
+3. Run `Exp1Driver.m` (results in Table 2 and Table 3 are not used).
+4. Run `ElementaryEffects_Analysis.ipynb` on **Data/Exp1/LARGE2ExperimentResultTable1.txt** to generate **MorrisResultsAnalysisTable1.parquet** (saved in **Data/Exp1**).
+5. Run `Exp1ReportResults.m` to generate Figure 3.
+
+`Exp1PlotData.m` and `Exp1AnalysisFeatures.m` are optional but useful for exploring the dataset.
+
+**Experiment 2 — Classifier feature selection datasets** (original dataset and expanded OpenFAST outputs)
+
+1. Run `Exp2Inputs.m` (creates a table with 500 input vectors).
+2. Run `Exp2Driver.m`, specifying OpenFAST outputs via `OutputChannels.txt` in `setup.m`. Results in **Data/Exp2**.
+3. Run `Exp10Inputs.m` (creates a table with 500 input vectors).
+4. Run `Exp10Driver.m`, specifying OpenFAST outputs via `OutputChannelsNew.txt` in `setup.m`. Results in **Data/Exp10**.
+
+**Experiment 3 — Emulator training datasets** (original dataset and expanded OpenFAST outputs)
+
+1. Run `Exp3Inputs.m` (creates a table with 210 input vectors calibrated for GP training).
+2. Run `Exp3Driver.m`, specifying OpenFAST outputs via `OutputChannels.txt` in `setup.m`. Results in **Data/Exp3**.
+3. Run `Exp7Inputs.m` (creates a table with 420 input vectors calibrated for GP training; not all samples were used in training).
+4. Run `Exp7Driver.m`, specifying OpenFAST outputs via `OutputChannelsNew.txt` in `setup.m`. Results in **Data/Exp7**.
+
+**Experiment 4 — Emulator-generated datasets** (original dataset and expanded OpenFAST outputs)
+
+**Experiment 5 — Classifier testing datasets** (original dataset and expanded OpenFAST outputs)
+
+1. Run `Exp6Inputs.m` (creates a table with 600 input vectors).
+2. Run `Exp6Driver.m`, specifying OpenFAST outputs via `OutputChannelsNew.txt` in `setup.m`. Results in **Data/Exp6**.
+
+### Multiple Datasets
+
+Sections 4.3 and 4.4 required additional simulations to add the features in `OutputChannelsNew.txt`. For continuity with the original work, datasets 2 and 3 are also included and used in the paper. All files for a given experiment are found in **Data/Exp#**.
+
+## Processing Time-Series Data
+
+Once the simulations on **Exp1_inTable.txt**, **Exp2_inTable.txt**, **Exp3_inTable.txt**, **Exp6_inTable.txt**, **Exp7_inTable.txt**, and **Exp10_inTable.txt** are complete, additional features are calculated on the time-series data and saved per simulation output. Each table is generated by running `AnalysisFeatures.m`, which calls `combineResultsLarge`, `combineResultsLargeNoisy`, and `combineResultsLarge3` (standard feature-extraction routines in the **funcs** folder).
+
+The resulting tables, with the paper section that uses each, are listed below:
 
 | Experiment | Table Name | Code | Paper Section |
-|------------|------------|----------|-------------|
-| Exp1       | **Data/Exp1/Large2ExperimentResultTable1_450.txt** | Exp1AnalysisFeatures | Section 4.1 |
-| Exp2       | **Data/Exp2/Large2ExperimentResultTable1_500.txt** | Exp2AnalysisFeatures | Section 4.2, 4.4 |
-| Exp3       | **Data/Exp3/Large2ExperimentResultTable1_210.txt** | Exp3AnalysisFeatures | Section 4.3.1, 4.3.2 |
-| Exp3       | **Data/Exp3/Large2noisyExperimentResultTable1_210.txt** | Exp3AnalysisFeatures | Section 4.4.1 |
-| Exp6       | **Data/Exp6/Large2ExperimentResultTable1_600.txt** | Exp6AnalysisFeatures | Section 4.4 |
-| Exp6       | **Data/Exp6/Large2noisyExperimentResultTable1_600.txt** | Exp6AnalysisFeatures | Section 4.4.1 |
-| Exp6       | **Data/Exp6/Large3ExperimentResultTable1_600.txt** | Exp6AnalysisFeatures | Section 4.4.2 |
-| Exp7       | **Data/Exp7/Large3ExperimentResultTable1_420.txt** | Exp7AnalysisFeatures | Section 4.4.2 |
-| Exp10      | **Data/Exp10/Large2noisyExperimentResultTable1_500.txt** | Exp10AnalysisFeatures | Section 4.4.1, 4.4.2 |
-| Exp10      | **Data/Exp10/Large3ExperimentResultTable1_500.txt** | Exp10AnalysisFeatures | Section 4.4.2 |
+|------------|------------|------|---------------|
+| Exp1 | **Data/Exp1/Large2ExperimentResultTable1_450.txt** | `Exp1AnalysisFeatures` | 4.1 |
+| Exp2 | **Data/Exp2/Large2ExperimentResultTable1_500.txt** | `Exp2AnalysisFeatures` | 4.2, 4.4 |
+| Exp3 | **Data/Exp3/Large2ExperimentResultTable1_210.txt** | `Exp3AnalysisFeatures` | 4.3.1, 4.3.2 |
+| Exp3 | **Data/Exp3/Large2noisyExperimentResultTable1_210.txt** | `Exp3AnalysisFeatures` | 4.4.1 |
+| Exp6 | **Data/Exp6/Large2ExperimentResultTable1_600.txt** | `Exp6AnalysisFeatures` | 4.4 |
+| Exp6 | **Data/Exp6/Large2noisyExperimentResultTable1_600.txt** | `Exp6AnalysisFeatures` | 4.4.1 |
+| Exp6 | **Data/Exp6/Large3ExperimentResultTable1_600.txt** | `Exp6AnalysisFeatures` | 4.4.2 |
+| Exp7 | **Data/Exp7/Large3ExperimentResultTable1_420.txt** | `Exp7AnalysisFeatures` | 4.4.2 |
+| Exp10 | **Data/Exp10/Large2noisyExperimentResultTable1_500.txt** | `Exp10AnalysisFeatures` | 4.4.1, 4.4.2 |
+| Exp10 | **Data/Exp10/Large3ExperimentResultTable1_500.txt** | `Exp10AnalysisFeatures` | 4.4.2 |
 
-## Gaussian Process Emulator training
-All of the calls needed to evaluate and test the GP modeling approaches are contained in **PPGP_ROM** and in the function **GP_training_comparison.m** For the noise experiment and non-aerodynamic sensor experiment, the files **Emulation_Trained_Classifier_Runner.m** contain the script to load and train the GP emulator. Since emulation is so cheap for a single fit (Note; all of the emulator training data is used here. Emulation training data is separate from the classifier testing data) there is no reason to load a stored model. The main expense is preparing the zGP censored data. 
+## Gaussian Process Emulator Training
 
-### Preparing Z-censored data
+All calls needed to evaluate and test the GP modeling approaches are in **PPGP_ROM** and in `GP_training_comparison.m`. For the noise and non-aerodynamic-sensor experiments, `Emulation_Trained_Classifier_Runner.m` loads and trains the GP emulator. Because a single fit is cheap (all emulator training data is used here, and is separate from the classifier testing data), there is no need to load a stored model. The main expense is preparing the zGP censored data.
 
-The script **PPGP_ROM/Prepare_zcensored_data.m** performs the imputation explained in Section 2.4.3.
+### Preparing Z-Censored Data
 
-A package of scripts for the parallel version of zGP training for MatLab is shared in **PPGP_ROM/parallel_training_zgp**. This version was used for the results in Section 4.2.1 and Section 4.2.2.
+`PPGP_ROM/Prepare_zcensored_data.m` performs the imputation described in Section 2.4.3.
+
+A parallel version of zGP training for MATLAB is shared in **PPGP_ROM/parallel_training_zgp**, used for the results in Sections 4.2.1 and 4.2.2.
 
 ## Machine Learning
-Class predictor selection is carried out three times using the datasets **Data/Exp2/Large2ExperimentResultTable1_500.txt**, **Data/Exp10/Large2noisyExperimentResultTable1_500.txt**, and **Data/Exp10/Large3ExperimentResultTable1_500.txt**. The target sensors are those selected as inputs for the classifier out of all of the potential sensor/time-series statistics and saved to an output file. 
 
-Predictor selection is carried out on a different dataset than the dataset used to train and test the classification algorithms using repeated k-fold cross-validation. 
+Class predictor selection is carried out three times, using **Data/Exp2/Large2ExperimentResultTable1_500.txt**, **Data/Exp10/Large2noisyExperimentResultTable1_500.txt**, and **Data/Exp10/Large3ExperimentResultTable1_500.txt**. The target sensors are those selected as classifier inputs from all potential sensor/time-series statistics and saved to an output file.
+
+Predictor selection is performed on a different dataset than the one used to train and test the classifiers, using repeated k-fold cross-validation.
 
 ### Analysis
 
-Generating a reproducible repeated k-fold cross-validation split is accomplished using **RandomForest/classifier_r_kfold_setup.m** which saves the sample-row indices for future experiments.
+- `RandomForest/classifier_r_kfold_setup.m` — generates a reproducible repeated k-fold split and saves the sample-row indices for future experiments.
+- `RandomForest/Emulation_Trained_Classifier_Runner.m` — trains the emulator, generates a set number of emulated sample points, fits a classifier to the emulated data, evaluates it on the simulated testing data, and saves the results.
+- `RandomForest/Simulation_Trained_Classifier_Runner.m` — loads the dataset, uses the pre-saved repeated k-fold splits, tunes hyperparameters on the training data each round, and stores the held-out predictions.
+- `RandomForest/ParallelProcessing/Simulation_Trained_Classifier_Runner_parallel.m` — the same analysis run in parallel on available cores (a parallel version is also in **RandomForest/Parallel_Train_Test**).
+- `RandomForest/Run_postprocessing.m` — loads the testing data and cross-validation results. Load the predictor names according to how they were saved for the experiment.
 
-**RandomForest/Emulation_Trained_Classifier_Runner.m** trains the emulator then generates a set number of emulated sample points. A classifier is fit to the emulated data. Then it is evaluated on the simulated testing data. At last, the results are saved.
+## Reproducing Figures
 
-**RandomForest/Simulation_Trained_Classifier_Runner.m** loads the dataset and then uses the pre-saved repeated k-fold splits. Hyperparameter tuning is performed on the training data for each round and the prediction on the held-out split is stored. 
+- **Figure 1:** Run `New_Plot_Function.m`.
+- **Figure 2:** Microsoft PowerPoint (not included).
+- **Figure 3:** Run *Improved Morris Plot Figure* in `Exp1ReportResults.m`.
+- **Figure 4:** Run `RandomForest/Class_Predictor_selection.m` with option (A).
+- **Figure 5:** Run `PPGP_ROM/GP_training_comparison.m`, section *Step 8.a) Plot the True vs Predicted Plots*.
+- **Figure 6:** Run `PPGP_ROM/GP_training_comparison.m`, section *Step 8.c) Plot the Inference Plots*.
+- **Figure 7:** Run `RandomForest/LearningCurveTableandFigures.m`, section *Step 5.) Make Top over Bottom Plot*.
+- **Figure 8:** Run `RandomForest/confusionmatrix_side_by_side.m` with option (A).
+- **Figure 9:** Run `RandomForest/ROC_figures_sidebyside.m`.
+- **Figure 10:** Run `RandomForest/Confusion_cost_study.m`, *Two Plot Version* at *Figure 2: Threshold tradeoff curves only*.
+- **Figure 11:** Run `RandomForest/confusionmatrix_side_by_side.m`, *Two Plot Version* at *Figure 1: Optimal confusion matrices only*.
+- **Figure 12:** Run `RandomForest/confusionmatrix_side_by_side.m` with option (C).
 
-A parallel version is found in the **RandomForest/Parallel_Train_Test** folder.
+## Reproducing Tables
 
-**RandomForest/ParallelProcessing/Simulation_Trained_Classifier_Runner_parallel.m** performs the same analysis in parallel on available cores.
-
-Finally, **RandomForest/Run_postprocessing.m** loads the testing data and the cross-validation results. The loading of the predictor names must be done according to how the predictors were saved for the experiment. 
-
-## Reproducing figures
-- Figure #1: Run **New_Plot_Function.m**.
-- Figure #2: (Microsoft Power-Point, not included)
-- Figure #3: Run *Improved Morris Plot Figure* in **Exp1ReportResults.m**.
-- Figure #4: Run **RandomForest/Class_Predictor_selection.m** with option (A).
-- Figure #5: Run **PPGP_ROM/GP_training_comparison.m** section *Step 8.a) Plot the True vs Predicted Plots*.
-- Figure #6: Run **PPGP_ROM/GP_training_comparison.m** section *Step 8.c) Plot the Inference Plots*.
-- Figure #7: Run **RandomForest/LearningCurveTableandFigures.m** section *Step 5.) Make Top over Bottom Plot*.
-- Figure #8: Run **RandomForest/confusionmatrix_side_by_side.m** with option (A).
-- Figure #9: Run **RandomForest/ROC_figures_sidebyside.m**.  
-- Figure #10: Run **RandomForest/Confusion_cost_study.m** *Two Plot Version** at *Figure 2: Threshold tradeoff curves only*
-- Figure #11: Run **RandomForest/confusionmatrix_side_by_side.m** *Two Plot Version** at *Figure 1: Optimal confusion matrices only*.
-- Figure #12: Run **RandomForest/confusionmatrix_side_by_side.m** with option (C).
-
-## Reproducing tables
-- Table #1: OpenFAST model information found [here](https://github.com/openfast).
-- Table #2: OpenFAST model information found [here](https://github.com/openfast).
-- Table #3: OpenFAST model information found [here](https://github.com/openfast).
-- Table #4: OpenFAST model information found [here](https://github.com/openfast).
-- Table #5: Experiment Design, see paper.
-- Table #6: See `Exp3Inputs.m`.
-- Table #7: Run **PPGP_ROM/GP_training_compariosn.m** section *Step 4.c) Print Results of Timing Tests*.
-- Table #8: Normalized root mean square error (NRMSE) for each emulator and sensor quantity selected in Fig. 4. Values are reported as mean ± confidence interval as the percentage of the output range. Run **PPGP_ROM/GP_training_compariosn.m**.
-- Table #9: Empirical coverage in percent of the nominal 95% credible intervals for each output. Run **PPGP_ROM/GP_training_compariosn.m**.
-- Table #10: Paired differences between the standard GP and PPzGP emulators. Run **PPGP_ROM/GP_training_comparison.m**.
-- Table #11: Wall-clock times and paragraph in Section 4.3 can be reproduced using **PPGP_ROM/GP_timing_script.m**.
-- Table #12: Paired differences in classifier performance between emulator-trained and simulator-trained classifiers for different emulated training-set sizes. Reproduce by using **RandomForest/LearningCurveTableandFigures.m**.
-- Table #13: Per-class AUC comparison between simulator-trained and emulator-trained classifier. Reproduce by using **RandomForest/LearningCurveTableandFigures.m**. 
-- Table #14: Class-wise differences between models, emulator trained minus simulator trained. Reproduce by using **RandomForest/LearningCurveTableandFigures.m**. 
-- Table #15: Per-class recall for the emulator-trained classifier with 10,000 generated samples and the simulator-trained classifier. Run **RandomForest/comparative_post_pro.m**. 
-- Table #16: Class-wise recall comparison between simulator-trained and emulator-trained classifiers under noisy sensing. Run **RandomForest/comparative_post_pro.m**.
-- Table #17: Additional OpenFAST output channels used in the reduced-sensing experiment. OpenFAST model information found [here](https://github.com/openfast).
-- Table #18: Additional time-series descriptors used in the reduced-sensing experiment. OpenFAST model information found [here](https://github.com/openfast).
-- Table #19: Comparison of simulator-trained and emulator-trained classifiers under the reduced-sensing experiment. Run **RandomForest/comparative_post_pro.m**.
+- **Tables 1–4:** OpenFAST model information (https://github.com/openfast).
+- **Table 5:** Experiment design — see paper.
+- **Table 6:** See `Exp3Inputs.m`.
+- **Table 7:** Run `PPGP_ROM/GP_training_comparison.m`, section *Step 4.c) Print Results of Timing Tests*.
+- **Table 8:** NRMSE for each emulator and sensor quantity in Fig. 4 (mean ± confidence interval, as a percentage of the output range). Run `PPGP_ROM/GP_training_comparison.m`.
+- **Table 9:** Empirical coverage (percent) of the nominal 95% credible intervals for each output. Run `PPGP_ROM/GP_training_comparison.m`.
+- **Table 10:** Paired differences between the standard GP and PPzGP emulators. Run `PPGP_ROM/GP_training_comparison.m`.
+- **Table 11:** Wall-clock times and the paragraph in Section 4.3. Run `PPGP_ROM/GP_timing_script.m`.
+- **Table 12:** Paired differences in classifier performance (emulator- vs. simulator-trained) across emulated training-set sizes. Run `RandomForest/LearningCurveTableandFigures.m`.
+- **Table 13:** Per-class AUC comparison (simulator- vs. emulator-trained). Run `RandomForest/LearningCurveTableandFigures.m`.
+- **Table 14:** Class-wise differences between models (emulator minus simulator trained). Run `RandomForest/LearningCurveTableandFigures.m`.
+- **Table 15:** Per-class recall for the emulator-trained classifier (10,000 generated samples) vs. the simulator-trained classifier. Run `RandomForest/comparative_post_pro.m`.
+- **Table 16:** Class-wise recall comparison under noisy sensing. Run `RandomForest/comparative_post_pro.m`.
+- **Table 17:** Additional OpenFAST output channels used in the reduced-sensing experiment (https://github.com/openfast).
+- **Table 18:** Additional time-series descriptors used in the reduced-sensing experiment (https://github.com/openfast).
+- **Table 19:** Comparison of simulator- and emulator-trained classifiers under reduced sensing. Run `RandomForest/comparative_post_pro.m`.
 
 # Template for OpenFAST Experimentation
-Below is a description of the template for automating the set-up of OpenFAST experiments in MATLAB. 
 
-This library provides a template for managing experiments with the OpenFAST [OpenFAST](https://github.com/OpenFAST/openfast?tab=readme-ov-file) simulation tool using MATLAB.  This code is a general template, fit to be modified for many different experiments.
+This library provides a MATLAB template for managing experiments with the [OpenFAST](https://github.com/OpenFAST/openfast) simulation tool. It is a general template, meant to be modified for many different experiments.
 
-# Description:
-This library/framework sets up experiments with OpenFAST by changing the input files in the appropriately.  With a large number of inputs, selecting only those pertinent to a particular study is difficult.  This library is a flexible approach for running experiments.  It separates the structuring of the experimental design and the analysis of the results from the editing of the input files.  It is modular, using helper functions which can be adapted to handle different input file types, enabling this framework to apply to different turbine setups and experiment designs.
+## Description
 
-The core of the library are two files.
+The framework sets up OpenFAST experiments by editing the input files appropriately. With so many inputs, selecting only those relevant to a study is difficult, so this library offers a flexible approach: it separates the experimental design and results analysis from the editing of the input files. It is modular, using helper functions that can be adapted to different input file types, so the framework applies to different turbine setups and experiment designs.
+
+The library has two core files:
+
 - `ExpTableGenerator.m`
 - `ExpDriver.m`
 
-Once the user has configured these files (and the helper functions), running the experiment and organizing the results for further analysis is simple.  Simply run the `ExpTableGenerator.m` then run the `ExpDriver.m`.
+Once these files (and the helper functions) are configured, running the experiment and organizing the results is simple: run `ExpTableGenerator.m`, then run `ExpDriver.m`.
 
-This framework streamlines OpenFAST input-output handling and keeps the data organized.  The user specifies an experiment to run by giving the input variables and settings for each test in the experiment as a matrix/table (each row is a different test, each column a different input).  Then the framework will set up and run the simulations required, organizing the outputs channels (dependent variables) requested by the user into a table that mirrors the input table provided.  In the end, the code generates a data-folder and a table of outputs from the experiment, in the same row-order as the input table.  Within the data-folder, small test-specific folders hold the summary files, time series data, and statistics for each test.
+The user specifies an experiment as a matrix/table where each row is a test and each column is an input. The framework sets up and runs the required simulations, organizing the requested output channels into a table that mirrors the input table. In the end, it generates a data folder and an output table in the same row-order as the input table. Within the data folder, small test-specific subfolders hold the summary files, time-series data, and statistics for each test.
 
-# Instructions:
+## Requirements
 
-Note: The scripts in this folder require:
-- MatLab (with Statistics and Machine Learning Toolkit)
-- Jupyter notebook (SAlib, Numpy, and Pandas)
-- RobustGasp for MatLab ([here](https://github.com/mengyanggu/robustgasp-in-matlab))
-- OpenFAST excecutable (adjust the path in the `testdriver.m` file)
-- OpenFAST controller conpiled in the correct directory ([here](https://github.com/OpenFAST/nrel-5mw-controllers))
+- MATLAB (with the Statistics and Machine Learning Toolbox)
+- Jupyter Notebook (SALib, NumPy, and Pandas)
+- RobustGasp for MATLAB (https://github.com/mengyanggu/robustgasp-in-matlab)
+- OpenFAST executable (adjust the path in `testdriver.m`)
+- OpenFAST controller, compiled in the correct directory (https://github.com/OpenFAST/nrel-5mw-controllers)
 
-## Step by Step
+## Step-by-Step
 
-### Step One: Table Generator 
+### Step One: Table Generator
 
-The `ExpTableGenerator.m` file uses the selected OpenFAST inputs given to make an InputTable for each experiment.  The resulting table is saved as a text file and will be read by the `ExpDriver.m` script.  Each column represents an independent variable.  Each test is a row of the table at a unique configuration of the inputs.  Taken together, all of the rows of the table will help to answer some question about wind turbine engineering.  Follow the comments within the table generator file in order to see where to make changes.
+`ExpTableGenerator.m` uses the selected OpenFAST inputs to build an input table for each experiment. The table is saved as a text file and read by `ExpDriver.m`. Each column is an independent variable; each row is a test at a unique configuration of the inputs. Together, the rows help answer some question about wind turbine engineering. Follow the in-file comments to see where to make changes:
 
-- Line 5: Determines the name of the experiment (must match the name given in `ExpDriver.m`)
-- Line 16: The *invarNames* refer to the independent variables required settings in the experiment.  Some of them may simply be a part of the experimental set-up and not variables at all.  In the given example, `windfileID` is the name of the wind file to simulate on, and will not be included in analysis.  In future experiments, multiple wind files may be specified.
-- Line 22: If wanted, the user can read in design points from another source and then do additional formating/manipulation in this file.
-- Line 25: Determine the number of tests to be run.
-- Line 27: This is the number of inputs (it could also be the number of independent variables).
-- Line 46: We save the table to a text file.
+- **Line 5:** Sets the experiment name (must match the name in `ExpDriver.m`).
+- **Line 16:** *invarNames* — the independent variables / required settings. Some are part of the setup rather than variables; e.g., `windfileID` is the wind file to simulate on and is not included in analysis. Future experiments may specify multiple wind files.
+- **Line 22:** Optionally read design points from another source and reformat them here.
+- **Line 25:** Sets the number of tests to run.
+- **Line 27:** The number of inputs (or independent variables).
+- **Line 46:** Saves the table to a text file.
 
 ### Step Two: How to Run a Simulation
 
-The `ExpDriver.m` file takes the input table from `ExpTableGenerator.m` to set up and run OpenFAST tests.  The results will be found in a newly created Data folder in a sub-folder with the name given by the test's name.
+`ExpDriver.m` takes the input table from `ExpTableGenerator.m` to set up and run OpenFAST tests. Results appear in a newly created `Data` folder, in a subfolder named after the test.
 
-- Line 8: This line sets the experiment name.  It must match the experiment name specified in line 5 of `ExpTableGenerator.m`.
-- Line 10: This file name must match the template files for the desired OpenFAST experiment configuration (in this example the IEA-15-240-RWT-Monopile).
-- Line 12: Set which row of the input table to start with and which row of the input table to stop after.  This allows for the same input table to be run in parallel on several CPUs at once.  (Though this would require additional post-processing to combine the results together at the end).
-- Line 14: Set the number of seconds for each test.
-- Line 16: Set the number of seconds from the end to start calculating things like mean, standard deviation, etc.
-- Line 18: Set the test time step.
-- Line 20: If true, then the `.out` file will be deleted to save memory.
-- Line 22: If true, then the big result table (a copy of the time-series of each requested channel found in the `.out` file but as a text table) is deleted.
-- Line 46: This is where the set-up begins, and where the OpenFAST executable is called.
-- Line 50: Note, when running, this code generates a file that can be used to quickly access the contents of the experiment data subfolders.  This is helpful when performing quality checks or looking at results of individual runs.  It is also how this script creates the result folders and tables.
-- Line 80: After the result tables for each test are made, then a list of output variables to be calculated is sent to the 'combineResults.m' function, which is found in the 'funcs' folder.  In this example, these are just names, but one could set these up as key words to automatically call different helper functions to explore different types of output analysis.
-- Line 87: This line moves the statusFile to the experiment subfolder.
+- **Line 8:** Sets the experiment name (must match line 5 of `ExpTableGenerator.m`).
+- **Line 10:** Must match the template files for the desired OpenFAST configuration (here, the IEA-15-240-RWT-Monopile).
+- **Line 12:** Sets the start and stop rows of the input table, allowing the same table to be run in parallel across CPUs (combining results requires extra post-processing).
+- **Line 14:** Sets the duration (seconds) of each test.
+- **Line 16:** Sets how many seconds from the end to use when calculating mean, standard deviation, etc.
+- **Line 18:** Sets the test time step.
+- **Line 20:** If true, deletes the `.out` file to save memory.
+- **Line 22:** If true, deletes the big result table (a text-table copy of the time series of each requested channel from the `.out` file).
+- **Line 46:** Where setup begins and the OpenFAST executable is called.
+- **Line 50:** Generates a file for quickly accessing the experiment data subfolders — useful for quality checks and inspecting individual runs. It also creates the result folders and tables.
+- **Line 80:** After each test's result table is made, a list of output variables is passed to `combineResults.m` (in the **funcs** folder). Here these are just names, but they could act as keywords to call different helper functions for different output analyses.
+- **Line 87:** Moves the status file to the experiment subfolder.
 
-Now we can go in depth on some of the key helper functions to explain how they work and how they can be modified.
+The next steps cover the key helper functions and how they can be modified.
 
 ### Step Three: Set-Up Function
 
-In the next steps, all of the named functions are found in the `funcs` folder.
+All named functions below are in the **funcs** folder.
 
-The `setup.m` function updates the OpenFAST files according to the experiment.  Each row of the input table is extracted and taken as in input to the `setup.m` function.  This function also takes as an input a small set of auxiliary variables.  In this example, those are the file location of the template folder, the current test number, the duration of each test (in seconds), the time step (in seconds), the id for status file, the test number, and the name of the experiment.  This can be changed according to needs.  
+`setup.m` updates the OpenFAST files for the experiment. Each row of the input table is passed to `setup.m`, along with a small set of auxiliary variables — here: the template folder location, the current test number, the test duration (seconds), the time step (seconds), the status-file ID, the test number, and the experiment name. These can be changed as needed.
 
-This file has three main sections.  In the first section, a series of helper functions are called to set up various module input files and simulation parameters.  In the second section, the output channels are formated according to an included `OutputChannels.txt` file.  Finally, in the third section, the simulation is run through the `testdriver.m` function and the results are moved to the storage folder.  Meanwhile, a status file keeps track of the tests that have been run, and will serve as a tool for indexing the saved tests in the rest of the `ExpDriver.m` script.
+The file has three sections:
 
-### Step Four: Anatomy of a Helper Function 
+1. Helper functions set up the module input files and simulation parameters.
+2. Output channels are formatted according to an included `OutputChannels.txt` file.
+3. The simulation runs via `testdriver.m` and the results are moved to the storage folder.
 
-The `setup.m` script is called first.
+Meanwhile, a status file tracks the tests that have run and is used to index the saved tests throughout `ExpDriver.m`.
 
-Each of these helper functions is similar and has the job of modifying one type of file for the simulation.  There is one file not needed for simulation, but should be changed and saved for each test; the README file is designed to document the inputs for a given test.  This file is modified and saved along with the results of the simulation in the test-specific data subfolder at the end of the experiment.  In this way, there is a unique README for each test.  This file can be found in the template directory.  The `make_readme.m` function can be modified to name tests according to any convention.  One obvious convention is to name tests based on the value of the independent variables for that specific test.
+### Step Four: Anatomy of a Helper Function
 
-The anatomy of a helper function is simple.  It takes as its input some portion of the current test row, and the location of the template file to be read in and the location of the resulting file to be saved to.
+`setup.m` is called first. Each helper function modifies one type of file for the simulation. One file, the README, is not needed for the simulation but is changed and saved for each test to document its inputs; it is saved with the results in the test-specific subfolder, giving each test a unique README. This file lives in the template directory, and `make_readme.m` can be modified to name tests by any convention — one obvious choice is naming tests by the values of their independent variables.
 
-As demonstrated above, the helper functions make use of a few basic functions.  These are:
-- `gather_up.m`: takes a fileID and returns a cell of all of its lines.
-- `lay_down.m`: take a cell made up of file lines and saves a text file to a specific location.
-- `editor.m`: this function is the very center of the text-editing scheme that is the true objective of this entire library.  Everything about this library is directed to set up this function to change the text to enable different test settings.
+Each helper function takes some portion of the current test row, the location of the template file to read in, and the location of the resulting file to save to. The helper functions rely on a few basic functions:
+
+- `gather_up.m` — takes a fileID and returns a cell array of all its lines.
+- `lay_down.m` — takes a cell array of file lines and saves a text file to a specific location.
+- `editor.m` — the center of the text-editing scheme that is the true objective of this library. Everything is directed toward configuring this function to change the text for different test settings.
 
 ### Step Five: Output Channel Control
 
-This is the second section of the `setup.m` function.
+This is the second section of `setup.m`, run through `outputfunc.m`, which modifies the output channels to look at. For this to work, the output sections at the end of each OpenFAST module file in the template folder must be deleted and moved into the output-channel file, set up as in `OutputChannels.txt`. If this recipe is not followed (i.e., the `1001` delimiter between each section), the code fails. When the script runs, it appends each section to the proper files in the simulate folder. Add and delete channels in `OutputChannels.txt`.
 
-This is run through `outputfunc.m`.  This function allows us to modify the output channels that we want to look at.  For this to work, the output sections at the end of each of the OpenFAST files for the different included modules in the Template folder must be deleted and moved to the output channel file with the particular set-up as seen in `OutputChannels.txt`.  If this recipe isn't followed (that is the 1001 included to delieanted between each section) then the code fails.  When this script runs, it appends each of these sections to the proper files in the simulate folder.  Adding and deleting channels is done on the `OutputChannels.txt` file.  The inputs to this function are the first part of the file ID for the simulate folder.  The cell of file ids is needed to correctly access each module file.  We need to know the location of the Output.txt file.  And last, we need to know the line where the output section begins for each module file.  
+The inputs to this function are: the first part of the file ID for the simulate folder, the cell of file IDs (to access each module file), the location of the `Output.txt` file, and the line where the output section begins for each module file.
 
-### Step Six: Setting up the Driver
+### Step Six: Setting Up the Driver
 
-This is the part of the `setup.m` function where the simulation actually takes place.  In the `testdriver.m` file, line 8 needs to point to the OpenFAST executable that you use.  Line 11 must point to the correct folder for where the .fst file will be.  Note, for different tests, the `move_clean.m` function might need to be adjusted so that it moves the required output files to the data folder for each test.  
+This is the part of `setup.m` where the simulation runs. In `testdriver.m`, line 8 must point to your OpenFAST executable, and line 11 must point to the folder where the `.fst` file will be. For different tests, `move_clean.m` may need adjusting so it moves the required output files to each test's data folder.
 
-Returning to the `setup.m` function, everything else deals with filling in the statusFile as the experiment progresses.  This file has many purposes.  It can be used to restart the experiment if a simulation crashed.  It can be used to index into the data folders conveniently.  It is needed for the data-table construction process.  If this framework is followed, the user does not need to change any lines after line 68.
+Back in `setup.m`, everything else fills in the status file as the experiment progresses. This file serves several purposes: it can restart the experiment after a crash, index into the data folders conveniently, and support the data-table construction process. If this framework is followed, the user does not need to change any lines after line 68.
 
+### Step Seven: Setting Up the Parameters of the Result Table
 
-### Step Seven: Setting up the Parameters of the Result Table
+Back in `ExpDriver.m`, two more functions remain. On line 58, `resultfunc.m` is called. Because it runs in a loop over the lines of the status file, it accesses files already moved to the data folder. `resultfunc.m` calls two basic functions:
 
-Back in the `ExpDriver.m` script, there are two more functions to address.  First, in line 58 we call the `resultfunc.m` helper function.  Since this function is called in a loop over the lines of the statusFile, that means we are accessing files that have been moved to the data folder.  The `resultsfunc.m` function calls two basic functions.  The first, `create_mat_files.m`, will make a table version of the `.out` file and will save the names of all of the outputs, as well as their units into a `.mat` file (cell).  The second, `create_sum_table.m` is more complicated.  This makes a table, where each row is given the name of one of the output channels.  Each column is some sort of statistic derived from the time series.  In this example, those statics are the mean and the standard deviation.  Note that additional attributes could be calculated (like frequencies), and, additional functions could be written to generate other types of time-series features.  If more features are added, line 30 will need to be modified, as well.  Note that all of these features need to be included in line 80 of the `ExpDriver.m` script.
+- `create_mat_files.m` — makes a table version of the `.out` file and saves the output names and their units to a `.mat` cell.
+- `create_sum_table.m` — makes a table where each row is an output channel and each column is a statistic derived from the time series (here, mean and standard deviation). Additional attributes (e.g., frequencies) could be computed, and other functions could generate other time-series features. If more features are added, line 30 must be modified, and all features must be included in line 80 of `ExpDriver.m`.
 
-Finally, when setting up the `combineResults.m` function, which is called in line 81 of `ExpDriver.m`, as long as the variable list corresponds with the features calculated in the `create_sum_table.m` function, then no lines need to be changed.  The resulting table will have both the input table, and the output feature value for each output channel/feature combination.  Each row of this table is a different test.  This is table is a convenient way of doing analysis on the experiment, or doing machine learning tasks, like training a Regression or classification algorithm.
+When setting up `combineResults.m` (called on line 81 of `ExpDriver.m`), no lines need changing as long as the variable list matches the features computed in `create_sum_table.m`. The resulting table combines the input table and the output feature value for each output-channel/feature combination, with each row a different test. This table is convenient for analysis or machine learning tasks such as training a regression or classification algorithm.
 
-Note, a few of the functions included in the `funcs` folder are not described thus far.  These are the plotting functions.
-- `plot_ts.m`: This requires the variable names (as formattedd in the data-folders), and a table of time series data.
-- `plot_multi.m`: Requires inputs, the table of time series data, the names (as formatted in the data-folders), and a table that gives what outputs to be plotted each other.
+A few functions in the **funcs** folder are not described above — the plotting functions:
 
-Additional functions should be written as needed, especially when seeking to expand the input available to be changed.  This might require some creativity for efficient indexing and modifying, but the existing functions are good blueprints.  The most common type of addaptation is in helper functions that set up the various module files.  The changes needed to adapt the summary tables are very slight.
+- `plot_ts.m` — requires the variable names (as formatted in the data folders) and a table of time-series data.
+- `plot_multi.m` — requires the table of time-series data, the names (as formatted in the data folders), and a table specifying which outputs to plot against each other.
 
-Note, in this repository, only the processed files are saved, raw time-series data should be generated locally. 
+Additional functions should be written as needed, especially when expanding the set of changeable inputs. This may require some creativity for efficient indexing and modifying, but the existing functions are good blueprints. The most common adaptation is in the helper functions that set up the module files; the changes needed for the summary tables are slight.
 
-Now we have gone through what each file does.  Hopefully this is clear enough to run and recreate the results of this experiment, and to adapt this framework for one's own experimental needs.
+In this repository, only the processed files are saved; raw time-series data should be generated locally.
 
-### Process for Running a new Experiment
+### Process for Running a New Experiment
 
-- Run `ExpTableGenerator.m` to generate a table of inputs for each test.
-- Run `ExpDriver.m` to set up the `Simulate` folder and run OpenFAST on each test, gathering up the results from all the tests into a data table, before moving the data table and the `StatusFile.txt` to the experiment folder within the `Data` folder.
+1. Run `ExpTableGenerator.m` to generate a table of inputs for each test.
+2. Run `ExpDriver.m` to set up the `Simulate` folder, run OpenFAST on each test, gather the results into a data table, and move the data table and `StatusFile.txt` to the experiment folder within **Data**.
 
-Now the experiment is finished, and the results are organized for analysis.
+The experiment is now finished and the results are organized for analysis.
 
-The authors of this script are grateful to Todd Griffith for the initial suggestion for the project and guidance in wind turbine engineering and Ipsita Mishra for her discussions and introductions to wind turbine modeling and OpenFAST software and development. 
+## Acknowledgments
+
+The authors are grateful to Todd Griffith for the initial project suggestion and guidance in wind turbine engineering, and to Ipsita Mishra for her discussions and introductions to wind turbine modeling and OpenFAST software and development.
 
 ## Questions or Concerns
 
-It is quite possible typos have accidently been left in the scripts provided here. If there is difficulty in reproducing any of the experiments, reach out to me at aidangettemy@rocketmail.com, where I can be reached for troubleshooting. 
+Typos may remain in the provided scripts. If you have difficulty reproducing any experiment, reach out to aidangettemy@rocketmail.com for troubleshooting.
 
 [^1]: Seidman, J.: SideofMan/zGP: zGP in R v1.0.0, https://doi.org/10.5281/zenodo.17956672, 2025.
