@@ -39,7 +39,7 @@ In order to run the scripts, a version of the OpenFAST software must be placed i
     - Run code: `Exp6Driver.m`. Specify the OpenFAST outputs using 'OutputChannelsNew.txt' in the 'setup.m' function. Resulting tables found in **Data/Exp6**.
   
 ### Multiple datasets
-Additional studies were carried out in Section 4.3 and Section 4.4 which additional simulations in order to add the features found in `OutputChannelsNew.txt`. However, for continuity with the original work, datasets 2, and 3 continue to be used.
+Additional studies were carried out in Section 4.3 and Section 4.4 which required additional simulations in order to add the features in `OutputChannelsNew.txt`. However, for continuity with the original work, datasets 2, and 3 are included and were also used in the paper.
 
 All files related to the running and output of a particular experiment are found in **Data/Exp#**.
 
@@ -66,6 +66,18 @@ After the simulations on input tables **Exp1_inTable.txt**, **Exp2_inTable.txt**
 ## Machine Learning
 Class predictor selection is carried out three times. 
 
+### Analysis
+
+Generating a reproducible repeated k-fold cross-validation splits. 
+
+**RandomForest/Emulation_Trained_Classifier_Runner.m**
+
+**RandomForest/Simulation_Trained_Classifier_Runner.m**
+
+**RandomForest/ParallelProcessing/Simulation_Trained_Classifier_Runner_parallel.m**.
+
+Finally, **RandomForest/Run_postprocessing.m**. 
+
 
 ## Reproducing figures
 - Figure #1: Run **New_Plot_Function.m**.
@@ -88,19 +100,19 @@ Class predictor selection is carried out three times.
 - Table #4: OpenFAST model information found [here](https://github.com/openfast).
 - Table #5: Experiment Design, see paper.
 - Table #6: See `Exp3Inputs.m`.
-- Table #7: timing
-- Table #8: Normalized root mean square error (NRMSE) for each emulator and sensor quantity selected in Fig. 4. Values are reported as mean ± confidence interval as the percentage of the output range
-- Table #9: Empirical coverage in percent of the nominal 95% credible intervals for each output.
-- Table #10: Paired differences between the standard GP and PPzGP emulators.
-- Table #11: Wall-clock
-- Table #12: Paired differences in classifier performance between emulator-trained and simulator-trained classifiers for different emulated training-set sizes.
-- Table #13: Per-class AUC comparison between simulator-trained and emulator-trained classifier
-- Table #14: Class-wise differences between models, emulator trained minus simulator trained.
-- Table #15: Per-class recall for the emulator-trained classifier with 10,000 generated samples and the simulator-trained classifier.
-- Table #16: Class-wise recall comparison between simulator-trained and emulator-trained classifiers under noisy sensing.
-- Table #17: Additional OpenFAST output channels used in the reduced-sensing experiment.
-- Table #18: Additional time-series descriptors used in the reduced-sensing experiment.
-- Table #19: Comparison of simulator-trained and emulator-trained classifiers under the reduced-sensing experiment.
+- Table #7: Run **PPGP_ROM/GP_training_compariosn.m** section *Step 4.c) Print Results of Timing Tests*.
+- Table #8: Normalized root mean square error (NRMSE) for each emulator and sensor quantity selected in Fig. 4. Values are reported as mean ± confidence interval as the percentage of the output range. Run **PPGP_ROM/GP_training_compariosn.m**.
+- Table #9: Empirical coverage in percent of the nominal 95% credible intervals for each output. Run **PPGP_ROM/GP_training_compariosn.m**.
+- Table #10: Paired differences between the standard GP and PPzGP emulators. Run **PPGP_ROM/GP_training_comparison.m**.
+- Table #11: Wall-clock times and paragraph in Section 4.3 can be reproduced using **PPGP_ROM/GP_timing_script.m**.
+- Table #12: Paired differences in classifier performance between emulator-trained and simulator-trained classifiers for different emulated training-set sizes. Reproduce by using **RandomForest/LearningCurveTableandFigures.m**.
+- Table #13: Per-class AUC comparison between simulator-trained and emulator-trained classifier. Reproduce by using **RandomForest/LearningCurveTableandFigures.m**. 
+- Table #14: Class-wise differences between models, emulator trained minus simulator trained. Reproduce by using **RandomForest/LearningCurveTableandFigures.m**. 
+- Table #15: Per-class recall for the emulator-trained classifier with 10,000 generated samples and the simulator-trained classifier. Run **RandomForest/comparative_post_pro.m**. 
+- Table #16: Class-wise recall comparison between simulator-trained and emulator-trained classifiers under noisy sensing. Run **RandomForest/comparative_post_pro.m**.
+- Table #17: Additional OpenFAST output channels used in the reduced-sensing experiment. OpenFAST model information found [here](https://github.com/openfast).
+- Table #18: Additional time-series descriptors used in the reduced-sensing experiment. OpenFAST model information found [here](https://github.com/openfast).
+- Table #19: Comparison of simulator-trained and emulator-trained classifiers under the reduced-sensing experiment. Run **RandomForest/comparative_post_pro.m**.
 
 # Template for OpenFAST Experimentation
 Below is a description of the template for automating the set-up of OpenFAST experiments in MATLAB. 
