@@ -1,0 +1,106 @@
+1001 Aerodyn Outputs
+          6   NBlOuts             - Number of blade node outputs [0 - 9] (-)
+          6,          8,         10, 		12, 		14, 		17    BlOutNd             - Blade nodes whose values will be output  (-)
+          0   NTwOuts             - Number of tower node outputs [0 - 9]  (-)
+          1,          2,          6    TwOutNd             - Tower nodes whose values will be output  (-)
+                   OutList             - The next line(s) contains a list of output parameters.  See OutListParameters.xlsx for a listing of available output channels, (-)
+"B1Pitch"               - Blade Pitch
+"B1N1Cl"
+"B1N2Cl"
+"B1N3Cl"
+"B1N4Cl"
+"B1N5Cl"
+"B1N6Cl"
+
+"B1N1Cd"
+"B1N2Cd"
+"B1N3Cd"
+"B1N4Cd"
+"B1N5Cd"
+"B1N6Cd"
+
+"RtSpeed"		- Rotor speed
+
+END of input file (the word "END" must appear in the first 3 columns of this last OutList line)
+  ---------------------- NODE OUTPUTS --------------------------------------------
+          3   BldNd_BladesOut  - Blades to output
+          6   BldNd_BlOutNd   - Blade nodes on each blade (currently unused)
+              OutList     - The next line(s) contains a list of output parameters.  See OutListParameters.xlsx, AeroDyn_Nodes tab for a listing of available output channels, (-)
+END of input file (the word "END" must appear in the first 3 columns of this last OutList line)
+---------------------------------------------------------------------------------------
+1001 ElastoDyn Outputs
+          0   NTwGages    - Number of tower nodes that have strain gages for output [0 to 9] (-)
+         10,         19,         28    TwrGagNd    - List of tower nodes that have strain gages [1 to TwrNodes] (-) [unused if NTwGages=0]
+          0   NBlGages    - Number of blade nodes that have strain gages for output [0 to 9] (-)
+          3,          6,         9,      12,     15,     17    BldGagNd    - List of blade nodes that have strain gages [1 to BldNodes] (-) [unused if NBlGages=0]
+              OutList     - The next line(s) contains a list of output parameters.  See OutListParameters.xlsx for a listing of available output channels, (-)
+
+"RootFxb1"                - Blade flapwise shear force at the blade root
+
+"RootFyb1"                - Blade edgewise shear force at the blade root
+
+"RootFzc1"                - Blade axial force at the blade root
+
+"RootMxb1"                - Blade edgewise moment(i.e., the moment caused by edgewise forces) at the blade root
+
+"RootMyb1"                - Blade flapwise moment(i.e., the moment caused by flapwise forces) at the blade root
+
+"RootMzc1"                - Blade pitching moment at the blade root
+
+"TipDxc1"              - Blade out-of-plane tip deflection (relative to the undeflected position)
+
+"TipDyc1"              - Blade in-plane tip deflection (relative to the undeflected position)
+
+"TipDzc1"              - Blade axial tip deflection (relative to the undeflected position)
+
+"TipDxb1"              - Blade flapwise tip deflection (relative to the undeflected position)
+
+"TipDyb1"               - Blade edgewise tip deflection (relative to the undeflected position)
+
+"TipALxb1"              - Blade local flapwise tip acceleration (absolute)
+
+"TipALyb1"              - Blade local edgewise tip acceleration (absolute)
+
+"TipALzb1"              - Blade local axial tip acceleration (absolute)
+
+"TipRDxb1"              - Blade roll (angular/rotational) tip deflection (relative to the undeflected position).In ADAMS, it is output as an Euler angle computed as the 3rd rotation in theyaw-pitch-roll rotation sequence. It is not output as an Euler angle in FAST,which assumes small blade deflections, so that the rotation sequence does not matter.
+
+"TipRDyb1"              - Blade pitch (angular/rotational) tip deflection (relative to the undeflected position).In ADAMS, it is output as an Euler angle computed as the 2nd rotation in theyaw-pitch-roll rotation sequence. It is not output as an Euler angle in FAST,which assumes small blade deflections, so that the rotation sequence does not matter
+
+"HSShftV"               - Angular Speed of Highspeed shaft and Generator
+
+"LSShftMxa"	            - Low-speed shaft torque (this is constant along the shaft and is equivalent to the rotor torque)
+
+"TwrBsMyt"		        - Tower base pitching (or fore-aft) moment (i.e., the moment caused by fore-aft forces)
+
+"TwrBsMxt"		        - Tower base roll (or side-to-side) moment (i.e., the moment caused by side-to-side forces)
+
+"YawBrMyp"		        - Nonrotating tower-top / yaw bearing pitch moment
+
+"NcIMUTAxs"		        - Nacelle inertial measurement unit translational acceleration (absolute)
+
+"NcIMUTAys"             - nacelle/tower-top side-side acceleration, if available 
+
+"LSSTipMys"             - low-speed shaft bending moment 
+
+"LSSTipMzs"             - low-speed shaft bending moment 
+
+"LSShftTq"              - low-speed shaft torque 
+
+END of input file (the word "END" must appear in the first 3 columns of this last OutList line)
+---------------------- NODE OUTPUTS --------------------------------------------
+        3   BldNd_BladesOut  - Blades to output
+        6   BldNd_BlOutNd   - Blade nodes on each blade (currently unused)
+            OutList     - The next line(s) contains a list of output parameters.  See OutListParameters.xlsx, AeroDyn_Nodes tab for a listing of available output channels, (-)
+END of input file (the word "END" must appear in the first 3 columns of this last OutList line)
+---------------------------------------------------------------------------------------
+1001 Inflow Wind
+
+END of input file (the word "END" must appear in the first 3 columns of this last OutList line)
+---------------------------------------------------------------------------------------
+1001 ServoDyn
+"GenPwr"                  - Electrical generator power and torque
+"GenTq"                   - Electrical generator power and torque
+"BlPitchC1"		          - Blade 1 pitch angle command
+END of input file (the word "END" must appear in the first 3 columns of this last OutList line)
+---------------------------------------------------------------------------------------
