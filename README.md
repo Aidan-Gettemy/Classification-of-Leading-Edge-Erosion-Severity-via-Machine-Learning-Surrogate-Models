@@ -272,6 +272,6 @@ The authors are grateful to Todd Griffith for the initial project suggestion and
 
 ## Questions or Concerns
 
-Typos may remain in the provided scripts. If you have difficulty reproducing any experiment, reach out to aidangettemy@rocketmail.com for troubleshooting.
+Typos may remain in the provided scripts. Also, all data related files were moved to the **Data**, but some scripts may not account for the change in location. If you have difficulty reproducing any experiment, reach out to aidangettemy@rocketmail.com for troubleshooting.
 
 [^1]: Seidman, J.: SideofMan/zGP: zGP in R v1.0.0, https://doi.org/10.5281/zenodo.17956672, 2025.
