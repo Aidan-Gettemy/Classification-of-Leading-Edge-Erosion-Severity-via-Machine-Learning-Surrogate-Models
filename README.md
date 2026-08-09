@@ -13,14 +13,14 @@ In order to run the scripts, a version of the OpenFAST driver must be placed in 
 
 ## Reproducing results from the paper
 1. Experiment 1: Global sensitivity analysis (Morris method analysis).
-    - Run code: `ElementaryEffects_Analysis.ipynb` to generate **Morris_Inputs.txt** (in **Data/Exp1**)
-    - Run code: `Exp1Inputs.m` (runs 3 different erosion profiles, only the 1st is studied here)
-    - Run code: `Exp1Driver.m` to create **Data/Exp1/LARGE2ExperimentResultTable1.txt**. Results found in Table2 and Table3 are not used. Use **Data/Exp1/LARGE2ExperimentResultTable1.txt** as input to
-    - Run code: `ElementaryEffects_Analysis.ipynb` on **Data/Exp1/LARGE2ExperimentResultTable1.txt** to generate **MorrisResultsAnalysisTable1.parquet**.
+    - Run code: `ElementaryEffects_Analysis.ipynb` to generate **Morris_Inputs.txt**. A version of **Morris_Inputs.txt** is saved in **Data/Exp1**.
+    - Run code: `Exp1Inputs.m` (runs 3 different erosion profiles, only the 1st is used in the paper)
+    - Run code: `Exp1Driver.m` to create **Data/Exp1/LARGE2ExperimentResultTable1.txt**. Results found in Table2 and Table3 are not used. **Data/Exp1/LARGE2ExperimentResultTable1.txt** is saved in **Data/Exp1**.
+    - Run code: `ElementaryEffects_Analysis.ipynb` on **Data/Exp1/LARGE2ExperimentResultTable1.txt** to generate **MorrisResultsAnalysisTable1.parquet**. **MorrisResultsAnalysisTable1.parquet** is saved in **Data/Exp1**.
     - Run code: `Exp1ReportResults.m` to generate Figure #3.
     - `Exp1PlotData.m` and `Exp1AnalysisFeatures.m` are optional, but useful to explore the dataset.
 2. Experiment 2: Classifier feature selection datasets (Original Dataset and Expanded OpenFAST outputs)
-    - Run code: `Exp2Inputs.m`
+    - Run code: `Exp2Inputs.m`. This script creates a table with 500 input vectors.
     - Run code: `Exp2Driver.m`. Specify the OpenFAST outputs using 'OutputChannels.txt' in the 'setup.m' function. Results found in **Data/**
     - Run code:
     - Run code: `ExpDriver.m`. Specify the OpenFAST outputs using 'OutputChannelsNew.txt' in the 'setup.m' function. Results found in **Data/**
@@ -31,8 +31,10 @@ In order to run the scripts, a version of the OpenFAST driver must be placed in 
     - Run code: 
 4. Experiment 4: Emulator Generated datasets (Original Dataset and Expanded OpenFAST outputs)
 6. Experiment 5: Classifier testing datasets (Original Dataset and Expanded OpenFAST outputs)
-Primary wind turbine erosion experiment. `Exp2Inputs.m`, `Exp2Driver.m`, `Exp2PlotData.m`, `Exp2AnalysisFeatures.m`. Dataset found in **Data/Exp2/LARGE2ExperimentResultTable500.txt**.
-Experiment 3: PPzGP training. `Exp3Inputs.m`, `Exp3Driver.m`, `Exp3PlotData.m`, `Exp3AnalysisFeatures.m`. Dataset found in **Data/Exp3/LARGE2ExperimentResultsTable1_210.txt**.
+    - Run code:
+    - Run code:
+    - Run code:
+    - Run code: 
 
 ## Reproducing figures
 - Figure #1: Run **New_Plot_Function.m**.
