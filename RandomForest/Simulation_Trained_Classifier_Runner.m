@@ -3,7 +3,7 @@ clc;close;clear;
 
 % Specify folds and repeats
 k_folds = 5;
-repeats = 1;
+repeats = 10;
 % Load the data: Set up for experiment 1
 data_original = readtable("../Data/Exp6/LARGE3ExperimentResultTable1_600.txt");
 FOLDS = load("10_x_5_test1RF_training_rkfolds.mat");FOLDS= FOLDS.FOLDS;
@@ -20,7 +20,7 @@ X = data_original(:,varnames);
 results_sim = run_repeated_kfold_rf( ...
     X, Y, predictorNames, "simulator-trained", k_folds, repeats, FOLDS);
 
-save("TEST1_results_sim_repeatedCV.mat","results_sim","-v7.3")
+save("TEST1star_results_sim_repeatedCV.mat","results_sim","-v7.3")
 
 %% FUNCTIONS
 function results = run_repeated_kfold_rf(X, Y, predictorNames, modelName, k_folds, repeats, FOLDS)
