@@ -3,12 +3,6 @@ clc;close all;clear;
 
 option = 'A';% 'B', 'C'
 
-C_emu = load("TEST1star_Results\CMEAN_emu10000.mat");
-C_emu = C_emu.Cmean;
-C_sim = load("TEST1star_Results\CMEAN_sim.mat");
-classes = C_sim.classes;
-C_sim = C_sim.Cmean;
-
 switch option
     case 'A'
         C_emu = load("TEST1star_Results\CMEAN_emu10000.mat");
