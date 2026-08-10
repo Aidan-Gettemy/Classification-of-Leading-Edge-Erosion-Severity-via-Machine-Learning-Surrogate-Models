@@ -63,7 +63,7 @@ p = numel(InNames);
 % until a reasonable number of predictors are identified
 % Check that prediction does not deteriorate on the reduced set.
 % Stop when this occurs.
-maxIter = 4;
+maxIter = 1;
 storage = zeros(maxIter,2);
 for t = 1:maxIter
     storage(t,1) = p;
@@ -308,9 +308,10 @@ end
 
 [sorted_imp,isorted_imp] = sort(meanimps,'descend');
 % isorted_imp has the index of the important predictors.  Save this
-%writematrix(isorted_imp,"Classification_imp_test3.txt")
-TARGET_SENSORS = InNames(isorted_imp(1:nvars));
-save("Classification_variables_test3.mat","TARGET_SENSORS");
+writematrix(isorted_imp,"Classification_imp_test1.txt")
+% For the 3rd test, use this
+% TARGET_SENSORS = InNames(isorted_imp(1:nvars));
+% save("Classification_variables_test3.mat","TARGET_SENSORS");
 %% FUNCTIONS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function varnames = predictor_list(suffixes,names)
